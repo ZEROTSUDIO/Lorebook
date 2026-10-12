@@ -1,0 +1,311 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Entries extends CI_Controller {
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->database();
+        $this->load->library('form_validation');
+        $this->ensure_session_world();
+    }
+
+    /**
+     * Browse encyclopedia entries
+     */
+    public function index()
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $type_slug = $this->input->get('type');
+        $status = $this->input->get('status');
+
+        $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug');
+        $this->db->from('entries');
+        $this->db->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left');
+        $this->db->where('entries.world_id', $world_id);
+
+        if (!empty($type_slug)) {
+            $this->db->where('entry_types.slug', $type_slug);
+        }
+        if (!empty($status)) {
+            $this->db->where('entries.status', $status);
+        }
+
+        $this->db->order_by('entries.updated_at', 'DESC');
+        $entries = $this->db->get()->result();
+
+        $active_world = $this->db->get_where('worlds', array('id' => $world_id))->row();
+        $entry_types = $this->db->get_where('entry_types', array('world_id' => $world_id))->result();
+
+        $data = array(
+            'page_title'     => 'The Encyclopedia',
+            'header_title'   => 'The Encyclopedia',
+            'sub_heading'    => 'CATALOGUS OMNIUM // VAULT OF RECORDED LORE',
+            'header_caption' => 'Master Index of Recorded Entities, Artifacts, and Chronicles',
+            'active_tab'     => !empty($type_slug) ? $type_slug : 'dashboard',
+            'active_world'   => $active_world,
+            'entries'        => $entries,
+            'entry_types'    => $entry_types,
+            'selected_type'  => $type_slug,
+            'selected_status'=> $status,
+            'content_view'   => 'entries/index',
+        );
+
+        $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * Inscribe new lore entry form
+     */
+    public function create()
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $active_world = $this->db->get_where('worlds', array('id' => $world_id))->row();
+        
+        // Fetch entry types for active world
+        $entry_types = $this->db->order_by('sort_order', 'ASC')->get_where('entry_types', array('world_id' => $world_id))->result();
+
+        // Ensure default property definitions exist for entry types
+        $this->ensure_default_properties($entry_types);
+
+        // Fetch properties definitions mapped by entry_type_id
+        $properties_by_type = array();
+        foreach ($entry_types as $type) {
+            $props = $this->db->order_by('sort_order', 'ASC')->get_where('property_definitions', array('entry_type_id' => $type->id))->result();
+            $properties_by_type[$type->id] = $props;
+        }
+
+        $data = array(
+            'page_title'         => 'Inscribe Entry',
+            'header_title'       => 'Inscribe Entry',
+            'sub_heading'        => 'CODEX SCRIBE // INSCRIBE NEW CHRONICLE',
+            'header_caption'     => 'Record a new person, seat of power, sacred relic, or historical event',
+            'active_tab'         => 'create',
+            'active_world'       => $active_world,
+            'entry_types'        => $entry_types,
+            'properties_by_type' => $properties_by_type,
+            'content_view'       => 'entries/create',
+        );
+
+        $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * Store new lore entry in MySQL
+     */
+    public function store()
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $user_id = $this->session->userdata('user_id') ?: 1;
+
+        // Validation rules
+        $this->form_validation->set_rules('title', 'Entry Title', 'required|trim|max_length[200]');
+        $this->form_validation->set_rules('entry_type_id', 'Entry Type', 'required|numeric');
+        $this->form_validation->set_rules('status', 'Canon Status', 'required|in_list[draft,canon,archived]');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->create();
+            return;
+        }
+
+        $title = $this->input->post('title', TRUE);
+        $slug_input = $this->input->post('slug', TRUE);
+        $slug = !empty($slug_input) ? url_title($slug_input, '-', TRUE) : url_title($title, '-', TRUE);
+
+        // Ensure slug uniqueness within world
+        $slug = $this->make_unique_slug($world_id, $slug);
+
+        $entry_data = array(
+            'public_id'        => $this->generate_uuid(),
+            'world_id'         => $world_id,
+            'entry_type_id'    => (int)$this->input->post('entry_type_id'),
+            'title'            => $title,
+            'slug'             => $slug,
+            'summary'          => $this->input->post('summary', TRUE),
+            'content_markdown' => $this->input->post('content_markdown'),
+            'status'           => $this->input->post('status', TRUE),
+            'cover_image'      => $this->input->post('cover_image', TRUE),
+            'is_archived'      => ($this->input->post('status') === 'archived') ? 1 : 0,
+            'created_by'       => $user_id,
+            'updated_by'       => $user_id,
+            'created_at'       => date('Y-m-d H:i:s'),
+            'updated_at'       => date('Y-m-d H:i:s'),
+        );
+
+        $this->db->insert('entries', $entry_data);
+        $entry_id = $this->db->insert_id();
+
+        // Save structured property values if submitted
+        $properties = $this->input->post('properties');
+        if (is_array($properties)) {
+            foreach ($properties as $prop_def_id => $val) {
+                if ($val !== '' && $val !== null) {
+                    $this->db->insert('property_values', array(
+                        'entry_id'               => $entry_id,
+                        'property_definition_id' => (int)$prop_def_id,
+                        'value_text'             => is_string($val) ? $val : json_encode($val),
+                        'created_at'             => date('Y-m-d H:i:s'),
+                        'updated_at'             => date('Y-m-d H:i:s'),
+                    ));
+                }
+            }
+        }
+
+        // Save tags if provided
+        $tags_input = $this->input->post('tags', TRUE);
+        if (!empty($tags_input)) {
+            $tag_names = array_map('trim', explode(',', $tags_input));
+            foreach ($tag_names as $tag_name) {
+                if (empty($tag_name)) continue;
+                $tag_slug = url_title($tag_name, '-', TRUE);
+
+                // Find or insert tag
+                $tag = $this->db->get_where('tags', array('world_id' => $world_id, 'slug' => $tag_slug))->row();
+                if (!$tag) {
+                    $this->db->insert('tags', array(
+                        'world_id'   => $world_id,
+                        'name'       => $tag_name,
+                        'slug'       => $tag_slug,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ));
+                    $tag_id = $this->db->insert_id();
+                } else {
+                    $tag_id = $tag->id;
+                }
+
+                $this->db->insert('entry_tags', array(
+                    'entry_id' => $entry_id,
+                    'tag_id'   => $tag_id,
+                ));
+            }
+        }
+
+        $this->session->set_flashdata('success_msg', 'Entry "' . $title . '" inscribed successfully into the Codex!');
+        redirect('entries/view/' . $entry_id);
+    }
+
+    /**
+     * Read / View Entry Dossier
+     */
+    public function view($id)
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $entry = $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug')
+                          ->from('entries')
+                          ->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left')
+                          ->where('entries.id', $id)
+                          ->where('entries.world_id', $world_id)
+                          ->get()->row();
+
+        if (!$entry) {
+            show_404();
+        }
+
+        // Fetch structured property values
+        $this->db->select('pv.*, pd.label, pd.field_key, pd.field_type');
+        $this->db->from('property_values pv');
+        $this->db->join('property_definitions pd', 'pd.id = pv.property_definition_id');
+        $this->db->where('pv.entry_id', $id);
+        $this->db->order_by('pd.sort_order', 'ASC');
+        $properties = $this->db->get()->result();
+
+        // Fetch tags
+        $this->db->select('t.name, t.slug');
+        $this->db->from('entry_tags et');
+        $this->db->join('tags t', 't.id = et.tag_id');
+        $this->db->where('et.entry_id', $id);
+        $tags = $this->db->get()->result();
+
+        $active_world = $this->db->get_where('worlds', array('id' => $world_id))->row();
+
+        $data = array(
+            'page_title'     => $entry->title,
+            'header_title'   => $entry->title,
+            'sub_heading'    => 'DOSSIER // ' . strtoupper($entry->type_name),
+            'header_caption' => 'Codex Entry Public ID: ' . $entry->public_id,
+            'active_tab'     => $entry->type_slug,
+            'active_world'   => $active_world,
+            'entry'          => $entry,
+            'properties'     => $properties,
+            'tags'           => $tags,
+            'content_view'   => 'entries/view',
+        );
+
+        $this->load->view('layouts/main', $data);
+    }
+
+    private function ensure_session_world()
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        if (!$world_id) {
+            $world = $this->db->get('worlds')->row();
+            if ($world) {
+                $this->session->set_userdata('active_world_id', $world->id);
+            }
+        }
+    }
+
+    private function ensure_default_properties($entry_types)
+    {
+        foreach ($entry_types as $type) {
+            $count = $this->db->where('entry_type_id', $type->id)->count_all_results('property_definitions');
+            if ($count === 0) {
+                if ($type->slug === 'persons') {
+                    $defs = array(
+                        array('field_key' => 'origin_seat', 'label' => 'Origin Seat', 'field_type' => 'text', 'sort_order' => 1),
+                        array('field_key' => 'clan', 'label' => 'Cohort / Clan', 'field_type' => 'text', 'sort_order' => 2),
+                        array('field_key' => 'aspect', 'label' => 'Arcane Aspect', 'field_type' => 'text', 'sort_order' => 3),
+                        array('field_key' => 'primary_relic', 'label' => 'Primary Relic', 'field_type' => 'text', 'sort_order' => 4),
+                    );
+                } elseif ($type->slug === 'realms') {
+                    $defs = array(
+                        array('field_key' => 'ruler', 'label' => 'Current Ruler', 'field_type' => 'text', 'sort_order' => 1),
+                        array('field_key' => 'capital', 'label' => 'Seat of Power', 'field_type' => 'text', 'sort_order' => 2),
+                        array('field_key' => 'climate', 'label' => 'Climate / Terrain', 'field_type' => 'text', 'sort_order' => 3),
+                    );
+                } else {
+                    $defs = array(
+                        array('field_key' => 'origin', 'label' => 'Origin / Creator', 'field_type' => 'text', 'sort_order' => 1),
+                        array('field_key' => 'powers', 'label' => 'Potency / Class', 'field_type' => 'text', 'sort_order' => 2),
+                    );
+                }
+
+                foreach ($defs as $d) {
+                    $this->db->insert('property_definitions', array(
+                        'entry_type_id' => $type->id,
+                        'field_key'     => $d['field_key'],
+                        'label'         => $d['label'],
+                        'field_type'    => $d['field_type'],
+                        'sort_order'    => $d['sort_order'],
+                        'created_at'    => date('Y-m-d H:i:s'),
+                        'updated_at'    => date('Y-m-d H:i:s'),
+                    ));
+                }
+            }
+        }
+    }
+
+    private function make_unique_slug($world_id, $base_slug)
+    {
+        $slug = $base_slug;
+        $counter = 1;
+        while ($this->db->where(array('world_id' => $world_id, 'slug' => $slug))->count_all_results('entries') > 0) {
+            $slug = $base_slug . '-' . $counter;
+            $counter++;
+        }
+        return $slug;
+    }
+
+    private function generate_uuid()
+    {
+        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0x0fff) | 0x4000,
+            mt_rand(0, 0x3fff) | 0x8000,
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        );
+    }
+}
