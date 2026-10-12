@@ -67,6 +67,11 @@ The technical boundary is kept intentionally lean, robust, and local-first to en
 
 ```mermaid
 erDiagram
+    USERS ||--o{ WORLD_MEMBERS : "collaborates in"
+    WORLDS ||--o{ WORLD_MEMBERS : "has members"
+    USERS ||--o{ WORLDS : "owns"
+    USERS ||--o{ ENTRIES : "authors"
+
     WORLDS ||--o{ ENTRIES : contains
     WORLDS ||--o{ ENTRY_TYPES : defines
     ENTRY_TYPES ||--o{ PROPERTY_DEFINITIONS : has
@@ -83,13 +88,16 @@ erDiagram
 ```
 
 ### 4.2 Core Tables Overview
-1. **`worlds`**: Multi-universe support (`id`, `public_id`, `name`, `slug`, `description`).
-2. **`entry_types`**: Configurable templates (`Character`, `Location`, `Faction`, `Artifact`, `Historical Event`, `Magic System`).
-3. **`entries`**: Core entity record (`id`, `public_id`, `world_id`, `entry_type_id`, `title`, `slug`, `summary`, `content_markdown`, `status`, `is_archived`).
-4. **`property_definitions` & `property_values`**: EAV-style typed custom fields (`value_text`, `value_number`, `value_boolean`, `value_date`, `referenced_entry_id`) preventing frequent table alter migrations.
-5. **`entry_relationships`**: Directed typed edges (`source_id`, `target_id`, `relationship_type`, `description`).
-6. **`timeline_events`**: Historical chronology supporting in-universe fictional eras and custom precision sort keys.
-7. **`media_attachments`**: Uploaded portrait and document metadata.
+1. **`users`**: Account registry (`id`, `public_id`, `username`, `email`, `password_hash`, `display_name`, `avatar`, `role`, `is_active`).
+2. **`world_members`**: Collaboration and world permissions (`world_id`, `user_id`, `role`).
+3. **`worlds`**: Multi-universe support (`id`, `public_id`, `owner_id`, `name`, `slug`, `visibility`, `description`).
+4. **`entry_types`**: Configurable templates (`Character`, `Location`, `Faction`, `Artifact`, `Historical Event`, `Magic System`).
+5. **`entries`**: Core entity record (`id`, `public_id`, `world_id`, `entry_type_id`, `title`, `slug`, `summary`, `content_markdown`, `status`, `is_archived`, `created_by`, `updated_by`).
+6. **`property_definitions` & `property_values`**: EAV-style typed custom fields (`value_text`, `value_number`, `value_boolean`, `value_date`, `referenced_entry_id`) preventing frequent table alter migrations.
+7. **`entry_relationships`**: Directed typed edges (`source_id`, `target_id`, `relationship_type`, `description`).
+8. **`timeline_events`**: Historical chronology supporting in-universe fictional eras and custom precision sort keys.
+9. **`tags` & `entry_tags`**: Cross-cutting classification labels.
+10. **`media_attachments`**: Uploaded portrait and document metadata.
 
 ---
 

@@ -47,13 +47,13 @@ class Migrate extends CI_Controller {
         if ($this->migration->current() === FALSE) {
             echo '<div class="error"><p><strong>Migration Error:</strong> ' . $this->migration->error_string() . '</p></div>';
         } else {
-            echo '<div class="success"><p><strong>Success:</strong> Database <code>lorekeeper</code> has been initialized with all 8 migrations (version ' . $this->config->item('migration_version', 'migration') . ')!</p></div>';
-            echo '<p>Tables created:</p><ul>
+            echo '<div class="success"><p><strong>Success:</strong> Database <code>lorekeeper</code> has been updated to migration version ' . $this->config->item('migration_version', 'migration') . '!</p></div>';
+            echo '<p>Tables present:</p><ul>
+                <li><code>users</code> &amp; <code>world_members</code></li>
                 <li><code>worlds</code></li>
                 <li><code>entry_types</code></li>
                 <li><code>entries</code></li>
-                <li><code>property_definitions</code></li>
-                <li><code>property_values</code></li>
+                <li><code>property_definitions</code> &amp; <code>property_values</code></li>
                 <li><code>entry_relationships</code></li>
                 <li><code>tags</code> &amp; <code>entry_tags</code></li>
                 <li><code>timeline_events</code></li>
