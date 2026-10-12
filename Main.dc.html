@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blended</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&amp;family=Newsreader:ital,wght@0,400;0,600;1,400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#18171C}
+a{text-decoration:none;color:inherit}a:hover{text-decoration:underline}
+</style>
+</helmet>
+<div style="max-width: 1280px; margin: 0 auto; box-sizing: border-box; padding: 36px; background-color: {{bg}}; background-image: repeating-linear-gradient(97deg, rgba(128,120,100,0.05) 0 1px, transparent 1px 4px), repeating-linear-gradient(11deg, rgba(128,120,100,0.04) 0 1px, transparent 1px 6px); color: {{text}}; font-family: 'Newsreader', Georgia, serif; display: flex; flex-direction: column; gap: 30px;">
+
+<header style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+<nav style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 36px; font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 17px; letter-spacing: 4px; text-transform: uppercase; color: {{accent}};">
+<a href="#" style="color: {{text}}; border-bottom: 1px solid {{accent}}; padding-bottom: 4px;">Persons</a><a href="#">Realms</a><a href="#">Orders</a><a href="#">Bestiary</a><a href="#">Chronicle</a>
+</nav>
+<h1 style="margin: 6px 0 0; font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 54px; letter-spacing: 8px; line-height: 1; text-transform: uppercase; color: {{accent}};">The Field Journal</h1>
+<div style="display: flex; align-items: center; gap: 14px; width: 320px;"><span style="flex: 1; height: 1px; background: {{line}};"></span><span style="width: 8px; height: 8px; border: 1px solid {{accent}}; transform: rotate(45deg);"></span><span style="width: 11px; height: 11px; background: {{accent}}; transform: rotate(45deg);"></span><span style="width: 8px; height: 8px; border: 1px solid {{accent}}; transform: rotate(45deg);"></span><span style="flex: 1; height: 1px; background: {{line}};"></span></div>
+</header>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 34px; align-items: start;">
+
+<aside style="display: flex; flex-direction: column; gap: 26px;">
+<section style="position: relative; padding: 3px; background: linear-gradient(135deg, #E3CC8F 0%, #C5A869 30%, #8F7640 55%, #D8BE80 80%, #A98F54 100%); box-shadow: 0 10px 30px rgba(0,0,0,0.35);">
+<div style="background: {{panel}}; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+<div style="margin: 6px; height: 250px; background: {{bg}}; border: 1px solid {{line}}; display: flex; align-items: flex-end; justify-content: center;"><span style="margin-bottom: 10px; font-style: italic; font-size: 14px; color: {{copper}};">[Portrait]</span></div>
+<div style="text-align: center;">
+<div style="font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; font-size: 17px; color: {{copper}};">No. 014</div>
+<h2 style="margin: 0; font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 34px; letter-spacing: 3px; text-transform: uppercase; color: {{accent}};">Ilsabet Voss</h2>
+<div style="font-style: italic; font-size: 16px;">the Lamplighter</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 6px 0;">
+<span style="font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; color: {{accent}}; border: 2px solid {{accent}}; padding: 0 10px; transform: rotate(-4deg);">Canon</span>
+<span style="font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; color: {{copper}}; border: 2px solid {{copper}}; padding: 0 10px; transform: rotate(3deg);">Confidential</span>
+</div>
+<div style="display: flex; flex-direction: column; font-size: 16px; border-top: 1px solid {{line}};">
+<div style="display: flex; justify-content: space-between; padding: 7px 10px; border-bottom: 1px solid {{line}};"><span style="color: {{accent}};">Origin</span><span>[Place]</span></div>
+<div style="display: flex; justify-content: space-between; padding: 7px 10px;"><span style="color: {{accent}};">Order</span><span>[Faction]</span></div>
+</div>
+</div>
+</section>
+
+<section style="background: {{panel}}; border: 1px solid {{line}}; padding: 16px 18px;">
+<div style="font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 18px; letter-spacing: 4px; text-transform: uppercase; color: {{accent}}; text-align: center;">Kindred</div>
+<svg viewBox="0 0 300 190" role="img" aria-label="Hand-drawn family tree: two parents above Ilsabet Voss, with one sibling and one child below" style="width: 100%; height: auto; display: block;">
+<g fill="none" stroke="{{accent}}" stroke-width="1.4" stroke-linecap="round">
+<path d="M80 30 Q150 38 220 30"></path><path d="M150 34 Q152 60 150 82"></path>
+<path d="M150 82 Q100 88 70 108"></path><path d="M150 82 Q200 88 230 108"></path>
+<path d="M230 140 Q232 158 230 166"></path>
+</g>
+<g stroke="{{accent}}" stroke-width="1.4">
+<circle cx="80" cy="26" r="12" fill="{{panel}}"></circle><circle cx="220" cy="26" r="12" fill="{{panel}}"></circle>
+<circle cx="230" cy="124" r="14" fill="{{accent}}"></circle><circle cx="70" cy="124" r="12" fill="{{panel}}"></circle>
+<circle cx="230" cy="176" r="9" fill="{{panel}}"></circle>
+</g>
+<g font-family="Newsreader, serif" font-size="12" fill="{{text}}" text-anchor="middle">
+<text x="80" y="52">[Father]</text><text x="220" y="52">[Mother]</text>
+<text x="70" y="148">[Sibling]</text><text x="230" y="102">Ilsabet</text>
+<text x="262" y="180" text-anchor="start">[Child]</text>
+</g>
+</svg>
+</section>
+</aside>
+
+<main style="grid-column: span 2; min-width: 0; display: flex; flex-direction: column; gap: 22px;">
+<article style="background: {{panel}}; border: 1px solid {{line}}; padding: 34px 42px; font-size: 20px; line-height: 1.75;">
+<div style="font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 30px; letter-spacing: 4px; text-transform: uppercase; color: {{accent}}; margin-bottom: 4px;">Early Life</div>
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px;"><span style="width: 7px; height: 7px; background: {{accent}}; transform: rotate(45deg);"></span><span style="flex: 1; height: 1px; background: {{line}};"></span></div>
+<p style="margin: 0 0 18px;"><span style="float: left; font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 88px; line-height: 0.8; padding: 8px 12px 0 0; color: {{accent}};">O</span>f the early years of this person little is set down, and what is recorded is [PLACEHOLDER TEXT]. The body is set in a high-contrast serif so it stays easy to read through a long session of writing.</p>
+<p style="margin: 0 0 18px;">[A second paragraph with an <a href="#" style="color: {{accent}}; border-bottom: 1px solid {{line}};">in-world link</a> and <em>italic emphasis</em> to show the rhythm.]</p>
+<blockquote style="margin: 24px 0 0; text-align: center; font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500; font-size: 26px; color: {{copper}};">“[A pulled quotation from an in-world source.]”</blockquote>
+</article>
+
+<section style="display: flex; flex-wrap: wrap; gap: 14px;">
+<a href="#" style="flex: 1; min-width: 190px; background: {{panel}}; border: 1px solid {{line}}; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; letter-spacing: 3px; color: {{copper}}; text-transform: uppercase;">Ally</span><span style="font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 22px; color: {{accent}};">[Related Entry]</span></a>
+<a href="#" style="flex: 1; min-width: 190px; background: {{panel}}; border: 1px solid {{line}}; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; letter-spacing: 3px; color: {{copper}}; text-transform: uppercase;">Rival</span><span style="font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 22px; color: {{accent}};">[Related Entry]</span></a>
+<a href="#" style="flex: 1; min-width: 190px; background: {{panel}}; border: 1px solid {{line}}; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; letter-spacing: 3px; color: {{copper}}; text-transform: uppercase;">Place</span><span style="font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 22px; color: {{accent}};">[Related Entry]</span></a>
+</section>
+</main>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"bg":{"editor":"color","default":"#18171C"},"panel":{"editor":"color","default":"#232128"},"text":{"editor":"color","default":"#EDE8DE"},"accent":{"editor":"color","default":"#C5A869"},"copper":{"editor":"color","default":"#BA7A55"},"line":{"editor":"color","default":"#3D382F"},"$preview":{"width":1280,"height":960}}'>
+class Component extends DCLogic {
+renderVals() {
+const p = this.props;
+return {
+bg: p.bg ?? '#18171C',
+panel: p.panel ?? '#232128',
+text: p.text ?? '#EDE8DE',
+accent: p.accent ?? '#C5A869',
+copper: p.copper ?? '#BA7A55',
+line: p.line ?? '#3D382F'
+};
+}
+}
+</script>
+</body>
+</html>
