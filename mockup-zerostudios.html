@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lorekeeper — Codex Canaan (Dark Fantasy Dossier Edition)</title>
+  <!-- Google Fonts: Cormorant Garamond (Ancient Display), Newsreader (Literary Prose), Space Mono (Archival Telemetry), Cinzel (Carved Stone Accents) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: {
+              base: '#151419',
+              deep: '#111014',
+              panel: '#1E1D24',
+              surface: '#272630',
+              line: '#3D382F',
+              ink: '#08070A'
+            },
+            parchment: {
+              DEFAULT: '#ECE7DD',
+              dim: '#CFC8BA',
+              dark: '#9E9788'
+            },
+            ash: '#8E887E',
+            gold: {
+              DEFAULT: '#C5A869',
+              light: '#E6D3A3',
+              pale: '#F4ECDB',
+              dark: '#856E3B',
+              bronze: '#6E5A2D'
+            },
+            copper: '#BA7A55',
+            crimson: {
+              DEFAULT: '#8A2B2B',
+              dark: '#581818',
+              seal: '#A53232'
+            }
+          },
+          fontFamily: {
+            display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            cinzel: ['"Cinzel"', 'Georgia', 'serif'],
+            prose: ['"Newsreader"', 'Georgia', 'serif'],
+            mono: ['"Space Mono"', 'monospace']
+          },
+          boxShadow: {
+            'ink-sm': '2px 2px 0 #08070A',
+            'ink': '4px 4px 0 #08070A',
+            'ink-lg': '6px 6px 0 #08070A',
+            'gold-sm': '2px 2px 0 #C5A869',
+            'gold-md': '4px 4px 0 #C5A869'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Dark Grimoire Tactile Paper Weave Texture */
+    .bg-grimoire-weave {
+      background-color: #151419;
+      background-image: 
+        repeating-linear-gradient(97deg, rgba(197, 168, 105, 0.035) 0 1px, transparent 1px 4px),
+        repeating-linear-gradient(11deg, rgba(120, 100, 70, 0.025) 0 1px, transparent 1px 6px);
+    }
+
+    /* Architectural Corner Crosshair Accent */
+    .corner-brackets {
+      position: relative;
+    }
+    .corner-brackets::before {
+      content: "⌜";
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      font-family: monospace;
+      font-size: 13px;
+      color: #C5A869;
+      opacity: 0.7;
+    }
+    .corner-brackets::after {
+      content: "⌟";
+      position: absolute;
+      bottom: 3px;
+      right: 5px;
+      font-family: monospace;
+      font-size: 13px;
+      color: #C5A869;
+      opacity: 0.7;
+    }
+
+    /* Wax Seal Stamp Texture */
+    .wax-seal {
+      background: radial-gradient(circle at 35% 35%, #A53232 0%, #752222 55%, #4A1414 100%);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.25), 3px 3px 0 #08070A;
+    }
+  </style>
+</head>
+
+<body class="bg-grimoire-weave text-parchment font-prose min-h-screen selection:bg-gold selection:text-paper-ink">
+
+  <!-- TOP MECHANICAL ARCHIVE STRIP -->
+  <div class="border-b-2 border-paper-ink bg-paper-deep/95 backdrop-blur px-4 sm:px-8 py-2 flex flex-wrap items-center justify-between text-xs font-mono text-ash gap-2">
+    <div class="flex items-center gap-3">
+      <!-- In-world sigil icon -->
+      <span class="w-3 h-3 border border-gold rotate-45 flex items-center justify-center">
+        <span class="w-1 h-1 bg-gold"></span>
+      </span>
+      <span class="tracking-widest uppercase font-bold text-parchment">CODEX ARCHIVIST // REALM OF CANAAN</span>
+      <span class="text-paper-line hidden sm:inline">|</span>
+      <span class="text-gold hidden sm:inline">CYCLE: 842 2A</span>
+    </div>
+    
+    <!-- Archival Status & Quick Controls -->
+    <div class="flex items-center gap-4 text-[11px]">
+      <span class="hidden md:inline text-parchment-dim">CANON INDEX: <strong class="text-parchment">142 TOMES</strong></span>
+      <span class="hidden md:inline text-parchment-dim">CONTRADICTIONS: <strong class="text-gold">0 FLAGGED</strong></span>
+      <div class="flex items-center gap-1.5 border border-gold/40 px-2 py-0.5 bg-paper-base shadow-ink-sm text-gold">
+        <span class="w-1.5 h-1.5 bg-gold rounded-full"></span>
+        <span class="font-bold tracking-wider">SEALED CANON</span>
+      </div>
+      <button class="border border-paper-line hover:border-gold px-2.5 py-0.5 bg-paper-panel text-parchment transition">
+        [CMD+K] QUERY
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN WRAPPER -->
+  <div class="max-w-7xl mx-auto p-4 sm:p-8 lg:p-10 flex flex-col gap-8">
+
+    <!-- HEADER / NAVIGATION (Dossier Title Bar with Ancient Regalia) -->
+    <header class="flex flex-col items-center gap-5 text-center border-b-2 border-paper-line pb-8">
+      
+      <!-- SUB-NAVIGATION BAR WITH SHARP TABS -->
+      <nav class="flex flex-wrap justify-center gap-2 font-mono text-xs uppercase tracking-widest text-ash">
+        <a href="#" class="px-3.5 py-1.5 border-2 border-gold text-gold font-bold shadow-ink-sm bg-paper-panel flex items-center gap-2">
+          <span class="w-1.5 h-1.5 bg-gold rotate-45 inline-block"></span> PERSONS &amp; CLANS
+        </a>
+        <a href="#" class="px-3.5 py-1.5 border-2 border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment transition bg-paper-panel">REALMS &amp; SEATS</a>
+        <a href="#" class="px-3.5 py-1.5 border-2 border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment transition bg-paper-panel">SACRED ORDERS</a>
+        <a href="#" class="px-3.5 py-1.5 border-2 border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment transition bg-paper-panel">BESTIARY &amp; RELICS</a>
+        <a href="#" class="px-3.5 py-1.5 border-2 border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment transition bg-paper-panel">CHRONICLE &amp; ERAS</a>
+        <a href="#" class="px-3.5 py-1.5 border-2 border-gold/70 text-gold-light hover:border-gold hover:text-white transition bg-paper-deep shadow-ink-sm flex items-center gap-1.5">
+          <span class="text-gold font-bold">＋</span> INSCRIBE ENTRY
+        </a>
+      </nav>
+
+      <!-- HEADLINE & ANCIENT HERALDRY -->
+      <div class="mt-2 flex flex-col items-center">
+        <div class="font-mono text-[11px] uppercase tracking-[0.35em] text-copper mb-2 flex items-center gap-2">
+          <span>◆</span> LIBER PERSONARUM // CHRONICLES OF CANAAN <span>◆</span>
+        </div>
+        <h1 class="font-display font-bold text-4xl sm:text-6xl lg:text-7xl tracking-widest uppercase text-gold leading-none drop-shadow-sm">
+          The Field Journal
+        </h1>
+        <p class="font-cinzel text-xs sm:text-sm tracking-[0.25em] text-parchment-dim uppercase mt-2">
+          Imperial Vault of Recorded Histories · Scribe Dossier 014
+        </p>
+      </div>
+
+      <!-- FANTASY ORNAMENTAL DIVIDER -->
+      <div class="flex items-center gap-3 w-80 max-w-full">
+        <span class="flex-1 h-px bg-paper-line"></span>
+        <span class="w-2 h-2 border border-gold rotate-45"></span>
+        <span class="w-3.5 h-3.5 border-2 border-gold rotate-45 flex items-center justify-center">
+          <span class="w-1.5 h-1.5 bg-gold"></span>
+        </span>
+        <span class="w-2 h-2 border border-gold rotate-45"></span>
+        <span class="flex-1 h-px bg-paper-line"></span>
+      </div>
+    </header>
+
+    <!-- WORKSPACE 3-COLUMN LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <!-- LEFT COLUMN: CHARACTER DOSSIER & ARCANE ATTRIBUTES (4 COLS) -->
+      <aside class="lg:col-span-4 flex flex-col gap-6">
+
+        <!-- 1. MAIN CHARACTER SHEET CARD -->
+        <section class="bg-paper-panel border-2 border-paper-line shadow-ink relative overflow-hidden">
+          
+          <!-- ZEROSTUDIOS FLUSH TITLE BAR -->
+          <div class="bg-paper-ink border-b-2 border-paper-line px-4 py-2.5 flex items-center justify-between text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-gold rotate-45"></span>
+              <span class="text-gold tracking-widest font-bold">DOSSIER // CAN-014</span>
+            </div>
+            <span class="text-ash text-[10px]">REVISION 04</span>
+          </div>
+
+          <div class="p-5 flex flex-col gap-5">
+            
+            <!-- PORTRAIT CONTAINER (Architectural Corner Marks + Gold Frame) -->
+            <div class="relative bg-paper-base border-2 border-paper-line p-2 shadow-ink-sm corner-brackets">
+              <div class="h-64 sm:h-72 bg-paper-deep flex flex-col items-center justify-end pb-4 border border-dashed border-paper-line relative overflow-hidden">
+                
+                <!-- Background Heraldic Watermark Rune -->
+                <svg class="absolute inset-0 m-auto w-40 h-40 opacity-10 text-gold" viewBox="0 0 100 100" fill="currentColor">
+                  <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="50" y1="5" x2="50" y2="95" stroke="currentColor" stroke-width="1"/>
+                  <line x1="10" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="1"/>
+                </svg>
+
+                <!-- Corner Crosshairs -->
+                <span class="absolute top-2 left-2 text-[11px] font-mono text-gold/60">+</span>
+                <span class="absolute top-2 right-2 text-[11px] font-mono text-gold/60">+</span>
+                <span class="absolute bottom-2 left-2 text-[11px] font-mono text-gold/60">+</span>
+                <span class="absolute bottom-2 right-2 text-[11px] font-mono text-gold/60">+</span>
+                
+                <span class="font-display italic text-lg text-copper mb-1">[Illuminated Portrait]</span>
+                <span class="font-mono text-[10px] text-ash tracking-widest uppercase">PLATE: ILSABET_VOSS_PORTRAIT.WEBP</span>
+              </div>
+            </div>
+
+            <!-- NAME & TITLES -->
+            <div class="text-center">
+              <div class="font-mono text-[11px] uppercase tracking-widest text-copper mb-1">NORTHMEN CLAN COHORT</div>
+              <h2 class="font-display font-bold text-3xl sm:text-4xl tracking-wider uppercase text-gold leading-tight">
+                Ilsabet Voss
+              </h2>
+              <div class="font-prose italic text-parchment-dim text-lg">“The Lamplighter of Canaan”</div>
+            </div>
+
+            <!-- INK STAMPS & REALM STATUS BADGES -->
+            <div class="flex flex-wrap justify-center items-center gap-2.5 py-1">
+              <span class="font-mono font-bold text-xs uppercase tracking-widest text-gold border-2 border-gold px-3 py-0.5 -rotate-2 shadow-ink-sm bg-paper-base">
+                CANON VERIFIED
+              </span>
+              <span class="font-mono font-bold text-xs uppercase tracking-widest text-copper border-2 border-copper px-3 py-0.5 rotate-2 shadow-ink-sm bg-paper-base">
+                RESTRICTED
+              </span>
+              <!-- Wax Seal Badge -->
+              <span class="wax-seal text-parchment font-cinzel text-[11px] font-bold px-3 py-0.5 rounded-sm tracking-wider uppercase flex items-center gap-1.5">
+                <span>✦</span> SEAL OF HIGH KEEP
+              </span>
+            </div>
+
+            <!-- STRUCTURED LORE ATTRIBUTES TABLE -->
+            <div class="border-t-2 border-paper-line pt-3 font-mono text-xs divide-y divide-paper-line">
+              <div class="flex justify-between py-2">
+                <span class="text-ash uppercase">Origin Seat</span>
+                <span class="text-parchment font-bold">Northern Highlands</span>
+              </div>
+              <div class="flex justify-between py-2">
+                <span class="text-ash uppercase">Affiliation</span>
+                <span class="text-parchment font-bold">The Ashen Guard</span>
+              </div>
+              <div class="flex justify-between py-2">
+                <span class="text-ash uppercase">Lineage</span>
+                <span class="text-parchment font-bold">Highland Clan Voss</span>
+              </div>
+              <div class="flex justify-between py-2">
+                <span class="text-ash uppercase">Life Status</span>
+                <span class="text-gold font-bold">Living (Age 28)</span>
+              </div>
+              <div class="flex justify-between py-2">
+                <span class="text-ash uppercase">Attunement</span>
+                <span class="text-parchment-dim font-bold">Lantern Fire // Tier III</span>
+              </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="grid grid-cols-2 gap-2 pt-1 font-mono text-xs uppercase tracking-wider">
+              <button class="py-2.5 border-2 border-gold bg-gold/10 hover:bg-gold hover:text-paper-ink transition text-gold font-bold shadow-ink-sm flex items-center justify-center gap-1.5">
+                <span>✎</span> EDIT ENTRY
+              </button>
+              <button class="py-2.5 border-2 border-paper-line bg-paper-base hover:border-parchment-dark text-parchment-dim transition shadow-ink-sm flex items-center justify-center gap-1.5">
+                <span>⎙</span> EXPORT COPIES
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. ARCANE INVENTORY & EQUIPPED ARTIFACTS (New Component) -->
+        <section class="bg-paper-panel border-2 border-paper-line shadow-ink">
+          <div class="bg-paper-ink border-b-2 border-paper-line px-4 py-2 flex items-center justify-between text-xs font-mono">
+            <span class="text-gold uppercase tracking-wider font-bold">RELICS &amp; WEAPONS</span>
+            <span class="text-ash text-[10px]">SLOTS: 3/4</span>
+          </div>
+
+          <div class="p-4 flex flex-col gap-3 font-mono text-xs">
+            <!-- Relic Item 1 -->
+            <div class="border border-paper-line bg-paper-base p-3 flex items-start gap-3 hover:border-gold transition">
+              <div class="w-8 h-8 border border-gold/70 bg-paper-panel flex items-center justify-center text-gold font-cinzel text-sm shrink-0">
+                🗡
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-parchment uppercase truncate">All-Black Sword</span>
+                  <span class="text-[10px] text-copper">CURSED</span>
+                </div>
+                <div class="text-[11px] font-prose italic text-parchment-dark mt-0.5">Forged during the Second Scourge; thirsts for starlight.</div>
+              </div>
+            </div>
+
+            <!-- Relic Item 2 -->
+            <div class="border border-paper-line bg-paper-base p-3 flex items-start gap-3 hover:border-gold transition">
+              <div class="w-8 h-8 border border-gold/70 bg-paper-panel flex items-center justify-center text-gold font-cinzel text-sm shrink-0">
+                🏮
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-parchment uppercase truncate">Lantern of the Hearth</span>
+                  <span class="text-[10px] text-gold">RELIC</span>
+                </div>
+                <div class="text-[11px] font-prose italic text-parchment-dark mt-0.5">Burns cold ash to reveal unseen ethereal trails.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. GENEALOGY / KINSHIP TREE -->
+        <section class="bg-paper-panel border-2 border-paper-line shadow-ink">
+          <div class="bg-paper-ink border-b-2 border-paper-line px-4 py-2 flex items-center justify-between text-xs font-mono">
+            <span class="text-gold uppercase tracking-wider font-bold">GENEALOGICAL TREE</span>
+            <span class="text-ash text-[10px]">NODES: 5</span>
+          </div>
+
+          <div class="p-5">
+            <svg viewBox="0 0 300 180" role="img" aria-label="Genealogy tree" class="w-full h-auto block">
+              <g fill="none" stroke="#C5A869" stroke-width="1.8" stroke-linecap="round">
+                <path d="M80 30 Q150 38 220 30" stroke-dasharray="3 3"></path>
+                <path d="M150 34 Q152 60 150 80"></path>
+                <path d="M150 80 Q100 86 70 106"></path>
+                <path d="M150 80 Q200 86 230 106"></path>
+                <path d="M230 134 Q232 150 230 158"></path>
+              </g>
+              <g stroke="#C5A869" stroke-width="1.8">
+                <circle cx="80" cy="26" r="12" fill="#1E1D24"></circle>
+                <circle cx="220" cy="26" r="12" fill="#1E1D24"></circle>
+                <circle cx="230" cy="120" r="14" fill="#C5A869"></circle>
+                <circle cx="70" cy="120" r="12" fill="#1E1D24"></circle>
+                <circle cx="230" cy="166" r="9" fill="#1E1D24"></circle>
+              </g>
+              <g font-family="Space Mono, monospace" font-size="10" fill="#ECE7DD" text-anchor="middle">
+                <text x="80" y="52" fill="#8E887E">Eirik</text>
+                <text x="220" y="52" fill="#8E887E">Maren</text>
+                <text x="70" y="146" fill="#8E887E">Torbjorn</text>
+                <text x="230" y="98" fill="#08070A" font-weight="bold">ILSABET</text>
+                <text x="262" y="170" text-anchor="start" fill="#8E887E">Kaer</text>
+              </g>
+            </svg>
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- RIGHT COLUMN: CHRONICLES, TIMELINE, CONTRADICTIONS, MAP (8 COLS) -->
+      <main class="lg:col-span-8 flex flex-col gap-6">
+
+        <!-- 4. MAIN CHRONICLE ARTICLE (Manuscript View) -->
+        <article class="bg-paper-panel border-2 border-paper-line shadow-ink">
+          
+          <!-- ARTICLE DOSSIER TITLE BAR -->
+          <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 border border-gold rotate-45 bg-gold/30"></span>
+              <span class="text-parchment font-bold uppercase tracking-wider">CHRONICLE RECORD // CANAAN-VOL-III</span>
+            </div>
+            <div class="flex items-center gap-3 text-ash text-[10px]">
+              <span>FOLIO: 184</span>
+              <span>WORDS: 612</span>
+              <span class="text-gold font-bold">STATUS: CANONICAL</span>
+            </div>
+          </div>
+
+          <!-- ARTICLE BODY -->
+          <div class="p-6 sm:p-10 font-prose text-lg sm:text-xl leading-relaxed text-parchment">
+            
+            <div class="flex items-center justify-between border-b border-paper-line pb-3 mb-6">
+              <h3 class="font-display font-bold text-2xl sm:text-3xl tracking-widest uppercase text-gold">
+                I. Early Life in the Ashen Wastes
+              </h3>
+              <span class="font-mono text-xs text-copper tracking-wider uppercase">[ERA // 842 2A]</span>
+            </div>
+
+            <!-- CLASSICAL DROP CAP -->
+            <p class="mb-6 text-justify">
+              <span class="float-left font-display font-bold text-7xl sm:text-8xl leading-[0.75] pr-3 pt-2 text-gold">O</span>
+              f the early years of this person little is set down in the high annals, and what remains is fraught with conflicting oral testimonies from clan elders. Born during the bitter winter of the Second Siege of Valoria, she was fostered among the torch-makers of the Western Bastion, trained in both ceremonial lantern craft and the defensive spear forms of the Ashen Guard.
+            </p>
+
+            <p class="mb-6 text-justify">
+              Before taking the solemn oath at the Obsidian Gateway, she traveled with the nomadic iron caravans across the 
+              <a href="#" class="text-gold border-b border-gold/70 hover:text-white hover:border-white font-serif italic transition">
+                Varkas Pass
+              </a>, 
+              where she first discovered the shattered fragments of the Void Crucible. It was here that she received the epithet <em>“The Lamplighter”</em> after guiding forty survivors through the blind blizzard of 856 2A.
+            </p>
+
+            <!-- PULLED QUOTE WITH ANCIENT SCRIBE STYLING -->
+            <blockquote class="my-8 p-6 bg-paper-base border-l-4 border-gold shadow-ink-sm text-center">
+              <p class="font-display italic font-semibold text-2xl text-copper">
+                “When the sun hides behind the iron peaks, it is not light we pray for, but the courage to bear the torch through the silence.”
+              </p>
+              <cite class="block mt-2 font-cinzel text-xs uppercase tracking-widest text-parchment-dark not-italic">
+                — Journal of the High Scribe, Codex IV · Stanza 12
+              </cite>
+            </blockquote>
+
+            <p class="text-justify">
+              In later chronicles, her refusal to kneel before King Aldric’s envoy led directly to the Schism of High Keep. While loyalists marked her as an apostate, the common clans of the low valleys preserve her name as a guardian spirit who tends the boundary fires.
+            </p>
+          </div>
+
+          <!-- ARTICLE FOOTER ARCHIVE METADATA -->
+          <div class="border-t-2 border-paper-line bg-paper-base px-6 py-3 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <div class="flex flex-wrap items-center gap-2 text-ash">
+              <span class="text-parchment font-bold">CROSS-REFERENCES:</span>
+              <span class="px-2 py-0.5 border border-paper-line bg-paper-panel text-parchment hover:border-gold cursor-pointer transition">#northmen</span>
+              <span class="px-2 py-0.5 border border-paper-line bg-paper-panel text-parchment hover:border-gold cursor-pointer transition">#ashen-guard</span>
+              <span class="px-2 py-0.5 border border-paper-line bg-paper-panel text-parchment hover:border-gold cursor-pointer transition">#second-siege</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="px-3 py-1 border border-paper-line bg-paper-panel hover:border-gold text-parchment transition">VIEW 4 REVISIONS</button>
+              <button class="px-3 py-1 border border-gold text-gold hover:bg-gold hover:text-paper-ink font-bold transition">INSCRIBE MARGINALIA</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- 5. CHRONOLOGICAL TIMELINE (New Component) -->
+        <section class="bg-paper-panel border-2 border-paper-line shadow-ink">
+          <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex items-center justify-between text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-copper"></span>
+              <span class="text-parchment font-bold uppercase tracking-wider">CHRONOLOGY // EVENT SEQUENCE</span>
+            </div>
+            <span class="text-ash text-[10px]">RECORDED EVENTS: 3</span>
+          </div>
+
+          <div class="p-6 font-mono text-xs">
+            <div class="relative border-l-2 border-gold/40 ml-3 pl-6 space-y-6">
+              
+              <!-- Event 1 -->
+              <div class="relative">
+                <span class="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full border-2 border-gold bg-paper-panel"></span>
+                <div class="text-copper text-[11px] font-bold">842 2A · WINTER SOLSTICE</div>
+                <div class="text-parchment font-bold font-display text-lg">Birth in the Ashen Wastes</div>
+                <div class="font-prose text-sm text-parchment-dim mt-0.5">Recorded by the Clan Elder under the sign of the Red Star.</div>
+              </div>
+
+              <!-- Event 2 -->
+              <div class="relative">
+                <span class="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full border-2 border-gold bg-paper-panel"></span>
+                <div class="text-copper text-[11px] font-bold">856 2A · THE GREAT FROST</div>
+                <div class="text-parchment font-bold font-display text-lg">Crossing of Varkas Pass</div>
+                <div class="font-prose text-sm text-parchment-dim mt-0.5">Discovery of the Void Relic and swearing of the Ashen Oath.</div>
+              </div>
+
+              <!-- Event 3 -->
+              <div class="relative">
+                <span class="absolute -left-[31px] top-1 w-3.5 h-3.5 rounded-full border-2 border-gold bg-gold"></span>
+                <div class="text-gold text-[11px] font-bold">870 2A · CURRENT CYCLE</div>
+                <div class="text-parchment font-bold font-display text-lg">The Refusal at High Keep</div>
+                <div class="font-prose text-sm text-parchment-dim mt-0.5">Defiance of King Aldric; onset of the Northern Rebellion.</div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. CONTRADICTION & MYSTERY TRACKER (New Component: Canon Protection) -->
+        <section class="bg-paper-panel border-2 border-paper-line shadow-ink">
+          <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex items-center justify-between text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 bg-crimson-seal"></span>
+              <span class="text-parchment font-bold uppercase tracking-wider">CANON DISCREPANCY &amp; UNRESOLVED MYSTERIES</span>
+            </div>
+            <span class="text-crimson-seal font-bold text-[10px]">2 UNRESOLVED</span>
+          </div>
+
+          <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+            <!-- Discrepancy 1 -->
+            <div class="border-2 border-paper-line bg-paper-base p-4 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-copper font-bold uppercase">[DISCREPANCY #01]</span>
+                <span class="text-[10px] text-ash">SOURCE: BOOK OF KINGS</span>
+              </div>
+              <p class="font-prose text-sm text-parchment leading-relaxed">
+                Imperial accounts claim Ilsabet perished at the Western Gate, yet Clan Voss tax ledgers list her receiving provisions 3 cycles later.
+              </p>
+              <div class="mt-auto pt-2 border-t border-paper-line text-[11px] text-gold flex items-center gap-1">
+                <span>✦ STATUS:</span> <em>Under author review</em>
+              </div>
+            </div>
+
+            <!-- Discrepancy 2 -->
+            <div class="border-2 border-paper-line bg-paper-base p-4 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-copper font-bold uppercase">[MYSTERY #08]</span>
+                <span class="text-[10px] text-ash">SOURCE: ORAL FOLKLORE</span>
+              </div>
+              <p class="font-prose text-sm text-parchment leading-relaxed">
+                True origin of the <em>Lantern of the Hearth</em>—did it belong to her father Eirik, or was it excavated beneath Mount Caan?
+              </p>
+              <div class="mt-auto pt-2 border-t border-paper-line text-[11px] text-gold flex items-center gap-1">
+                <span>✦ STATUS:</span> <em>Draft idea in progress</em>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. CONNECTED ENTRIES & REALM CARDS -->
+        <section>
+          <div class="font-mono text-xs uppercase tracking-widest text-copper mb-3 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 bg-copper inline-block"></span>
+            CONNECTED CODEX ENTRIES &amp; BACKLINKS
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- CARD 1 -->
+            <a href="#" class="bg-paper-panel border-2 border-paper-line shadow-ink p-4 hover:border-gold transition flex flex-col gap-1.5 group">
+              <div class="flex justify-between items-center text-[10px] font-mono text-copper group-hover:text-gold transition">
+                <span>WARRIOR // ALLY</span>
+                <span>REL-01</span>
+              </div>
+              <span class="font-display font-bold text-2xl text-parchment group-hover:text-gold transition">Blondt-Har</span>
+              <span class="font-mono text-[11px] text-ash">Commander of the Vanguard</span>
+              <span class="text-xs font-prose text-parchment-dark mt-1 border-t border-paper-line pt-1">Sworn brother at the Siege of Valoria.</span>
+            </a>
+
+            <!-- CARD 2 -->
+            <a href="#" class="bg-paper-panel border-2 border-paper-line shadow-ink p-4 hover:border-gold transition flex flex-col gap-1.5 group">
+              <div class="flex justify-between items-center text-[10px] font-mono text-copper group-hover:text-gold transition">
+                <span>RELIC // CURSED</span>
+                <span>REL-09</span>
+              </div>
+              <span class="font-display font-bold text-2xl text-parchment group-hover:text-gold transition">All-Black Sword</span>
+              <span class="font-mono text-[11px] text-ash">Cursed Greatblade</span>
+              <span class="text-xs font-prose text-parchment-dark mt-1 border-t border-paper-line pt-1">Carried during her youth in the Pass.</span>
+            </a>
+
+            <!-- CARD 3 -->
+            <a href="#" class="bg-paper-panel border-2 border-paper-line shadow-ink p-4 hover:border-gold transition flex flex-col gap-1.5 group">
+              <div class="flex justify-between items-center text-[10px] font-mono text-copper group-hover:text-gold transition">
+                <span>SEAT // STRONGHOLD</span>
+                <span>REL-14</span>
+              </div>
+              <span class="font-display font-bold text-2xl text-parchment group-hover:text-gold transition">Obsidian Gate</span>
+              <span class="font-mono text-[11px] text-ash">Northern Fortification</span>
+              <span class="text-xs font-prose text-parchment-dark mt-1 border-t border-paper-line pt-1">Site of her rebellion against King Aldric.</span>
+            </a>
+          </div>
+        </section>
+
+      </main>
+
+    </div>
+
+    <!-- MECHANICAL SCRIBE FOOTER -->
+    <footer class="mt-8 pt-6 border-t-2 border-paper-line flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-ash gap-4">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 bg-gold rotate-45"></span>
+        <span>LOREKEEPER ARCHIVAL ENGINE · CANAAN CODEX ED.</span>
+      </div>
+      <div class="flex items-center gap-4 text-parchment-dim">
+        <span>PRESS <kbd class="border border-paper-line px-1.5 py-0.5 bg-paper-base text-gold">[CMD+K]</kbd> FOR GLOBAL SEARCH</span>
+        <span class="text-gold font-bold">● ARCHIVE INTEGRITY: 100%</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
