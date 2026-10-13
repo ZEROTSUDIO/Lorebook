@@ -6,23 +6,29 @@
     <?php 
       $current_tab = isset($active_tab) ? $active_tab : 'dashboard';
     ?>
-    <a href="<?php echo base_url('dashboard'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'dashboard' || $current_tab === 'persons') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> flex items-center gap-2 transition">
-      <span class="w-1.5 h-1.5 bg-gold rotate-45 inline-block"></span> PERSONS &amp; CLANS
+    <a href="<?php echo base_url('dashboard'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'dashboard') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> flex items-center gap-2 transition">
+      <span class="w-1.5 h-1.5 bg-gold rotate-45 inline-block"></span> FIELD JOURNAL
     </a>
-    <a href="<?php echo base_url('realms'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'realms') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
+    <a href="<?php echo base_url('entries'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'encyclopedia') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
+      ALL RECORDS
+    </a>
+    <a href="<?php echo base_url('entries?type=persons'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'persons') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
+      PERSONS &amp; CLANS
+    </a>
+    <a href="<?php echo base_url('entries?type=realms'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'realms') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
       REALMS &amp; SEATS
     </a>
-    <a href="<?php echo base_url('orders'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'orders') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
+    <a href="<?php echo base_url('entries?type=orders'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'orders') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
       SACRED ORDERS
     </a>
-    <a href="<?php echo base_url('bestiary'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'bestiary') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
+    <a href="<?php echo base_url('entries?type=bestiary'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'bestiary') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
       BESTIARY &amp; RELICS
     </a>
-    <a href="<?php echo base_url('timeline'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'timeline') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
+    <a href="<?php echo base_url('entries?type=chronicle'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'chronicle' || $current_tab === 'timeline') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
       CHRONICLE &amp; ERAS
     </a>
-    <a href="<?php echo base_url('entries/create'); ?>" class="px-3.5 py-1.5 border-2 border-gold/70 text-gold-light hover:border-gold hover:text-white transition bg-paper-deep shadow-ink-sm flex items-center gap-1.5">
-      <span class="text-gold font-bold">＋</span> INSCRIBE ENTRY
+    <a href="<?php echo base_url('entries/create'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'create') ? 'border-gold text-paper-ink bg-gold font-bold shadow-ink-sm' : 'border-gold/70 text-gold-light hover:border-gold hover:text-white bg-paper-deep shadow-ink-sm'; ?> transition flex items-center gap-1.5">
+      <span class="font-bold">＋</span> INSCRIBE ENTRY
     </a>
   </nav>
 

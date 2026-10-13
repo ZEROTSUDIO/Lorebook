@@ -245,6 +245,50 @@
       </div>
     </section>
 
+    <!-- 3. RECENTLY INSCRIBED CODEX RECORDS (LIVE FROM MYSQL) -->
+    <?php if (!empty($recent_entries)): ?>
+      <section class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
+        <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex items-center justify-between text-xs font-mono">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-gold rotate-45"></span>
+            <span class="text-gold tracking-widest font-bold uppercase">RECENTLY INSCRIBED RECORDS</span>
+          </div>
+          <a href="<?php echo base_url('entries'); ?>" class="text-parchment-dim hover:text-gold text-[11px] uppercase transition">
+            [BROWSE FULL ENCYCLOPEDIA &rarr;]
+          </a>
+        </div>
+
+        <div class="divide-y divide-paper-line font-mono text-xs">
+          <?php foreach ($recent_entries as $rec): ?>
+            <div class="px-5 py-3.5 hover:bg-paper-base/70 transition flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <span class="text-ash text-[11px]">#<?php echo str_pad($rec->id, 3, '0', STR_PAD_LEFT); ?></span>
+                <div>
+                  <a href="<?php echo base_url('entries/view/' . $rec->id); ?>" class="font-display font-bold text-xl text-gold hover:text-gold-light tracking-wide uppercase">
+                    <?php echo html_escape($rec->title); ?>
+                  </a>
+                  <span class="ml-2 text-[10px] text-copper uppercase tracking-wider">[<?php echo html_escape($rec->type_name); ?>]</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <?php if ($rec->status === 'canon'): ?>
+                  <span class="border border-gold text-gold px-2 py-0.5 text-[10px] font-bold uppercase bg-paper-deep">CANON</span>
+                <?php elseif ($rec->status === 'draft'): ?>
+                  <span class="border border-copper text-copper px-2 py-0.5 text-[10px] font-bold uppercase bg-paper-deep">DRAFT</span>
+                <?php else: ?>
+                  <span class="border border-ash text-ash px-2 py-0.5 text-[10px] font-bold uppercase bg-paper-deep">ARCHIVED</span>
+                <?php endif; ?>
+                <a href="<?php echo base_url('entries/view/' . $rec->id); ?>" class="border border-paper-line hover:border-gold px-2.5 py-1 bg-paper-base text-parchment text-[10px] uppercase transition">
+                  OPEN &rarr;
+                </a>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </section>
+    <?php endif; ?>
+
   </main>
 
 </div>

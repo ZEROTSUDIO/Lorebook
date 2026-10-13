@@ -141,16 +141,17 @@ lorekeeper/
 
 ## 6. Development Milestones & Roadmap
 
-### Milestone 1: Project Foundation & World Scoping (Current)
+### Milestone 1: Project Foundation & World Scoping (Completed)
 - [x] UI Prototype and Design Language established (`mockup-zerostudios.html`).
-- [ ] Initialize clean CodeIgniter 3 structure in `D:\Wengdev\Lorebook`.
-- [ ] Implement initial database migrations for `worlds`, `entry_types`, and `entries`.
-- [ ] Verify complete data isolation between separate test worlds.
+- [x] Initialize clean CodeIgniter 3 structure in `c:\xampp\htdocs\Lorekeeper`.
+- [x] Implement database migrations (`001` through `009`) including `users`, `world_members`, `worlds`, `entry_types`, `entries`, `properties`, `relationships`, `tags`, `timeline`, and `media`.
+- [x] Build modular layout shell (`head`, `topbar`, `header`, `footer`, `layouts/main`) and auto-seeding `Dashboard`.
 
-### Milestone 2: Encyclopedia CRUD & Custom Attributes
-- [ ] Build entry creation, detail view, editing, and soft-archiving.
-- [ ] Implement schema-driven property editor (custom fields per entry type).
-- [ ] Full-text search and multi-attribute filters (Type, Status, Tag).
+### Milestone 2: Encyclopedia CRUD & Custom Attributes (In Progress)
+- [x] Build entry creation (`entries/create`) and detail dossier view (`entries/view`).
+- [ ] Build Encyclopedia Browser (`entries/index`) with search and multi-attribute filters (Type, Status, Tag).
+- [ ] Build entry editing (`entries/edit`), updating, and soft-archiving.
+- [ ] Implement schema-driven template & property manager UI (add/edit custom fields per entry type).
 
 ### Milestone 3: Dual Editor & Media Vault
 - [ ] Integrate local WYSIWYG editor with lossless Markdown two-way conversion.

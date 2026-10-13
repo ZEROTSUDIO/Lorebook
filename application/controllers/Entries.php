@@ -12,43 +12,107 @@ class Entries extends CI_Controller {
     }
 
     /**
-     * Browse encyclopedia entries
+     * Browse encyclopedia entries with search, type, status, tag filters, and sorting
      */
     public function index()
     {
         $world_id = $this->session->userdata('active_world_id');
-        $type_slug = $this->input->get('type');
-        $status = $this->input->get('status');
+        $search    = trim((string)$this->input->get('q', TRUE));
+        $type_slug = trim((string)$this->input->get('type', TRUE));
+        $status    = trim((string)$this->input->get('status', TRUE));
+        $tag_slug  = trim((string)$this->input->get('tag', TRUE));
+        $sort      = trim((string)$this->input->get('sort', TRUE)) ?: 'updated_desc';
 
         $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug');
         $this->db->from('entries');
         $this->db->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left');
+
+        if (!empty($tag_slug)) {
+            $this->db->join('entry_tags', 'entry_tags.entry_id = entries.id', 'inner');
+            $this->db->join('tags', 'tags.id = entry_tags.tag_id', 'inner');
+            $this->db->where('tags.slug', $tag_slug);
+        }
+
         $this->db->where('entries.world_id', $world_id);
 
         if (!empty($type_slug)) {
             $this->db->where('entry_types.slug', $type_slug);
         }
+
         if (!empty($status)) {
             $this->db->where('entries.status', $status);
+        } else {
+            // Default view hides archived entries unless filtered
+            $this->db->where('entries.is_archived', 0);
         }
 
-        $this->db->order_by('entries.updated_at', 'DESC');
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('entries.title', $search);
+            $this->db->or_like('entries.summary', $search);
+            $this->db->or_like('entries.content_markdown', $search);
+            $this->db->group_end();
+        }
+
+        if ($sort === 'title_asc') {
+            $this->db->order_by('entries.title', 'ASC');
+        } elseif ($sort === 'created_desc') {
+            $this->db->order_by('entries.created_at', 'DESC');
+        } else {
+            $this->db->order_by('entries.updated_at', 'DESC');
+        }
+
         $entries = $this->db->get()->result();
 
+        // Attach tags for each entry
+        foreach ($entries as $entry) {
+            $entry->tags = $this->db->select('t.name, t.slug')
+                                    ->from('entry_tags et')
+                                    ->join('tags t', 't.id = et.tag_id')
+                                    ->where('et.entry_id', $entry->id)
+                                    ->get()->result();
+        }
+
         $active_world = $this->db->get_where('worlds', array('id' => $world_id))->row();
-        $entry_types = $this->db->get_where('entry_types', array('world_id' => $world_id))->result();
+        $entry_types  = $this->db->order_by('sort_order', 'ASC')->get_where('entry_types', array('world_id' => $world_id))->result();
+        $all_tags     = $this->db->order_by('name', 'ASC')->get_where('tags', array('world_id' => $world_id))->result();
+
+        // Topbar stats
+        $total_entries = $this->db->where('world_id', $world_id)->count_all_results('entries');
+        $canon_count   = $this->db->where(array('world_id' => $world_id, 'status' => 'canon'))->count_all_results('entries');
+        $draft_count   = $this->db->where(array('world_id' => $world_id, 'status' => 'draft'))->count_all_results('entries');
+
+        // Determine dynamic header title when filtering by category
+        $header_title = 'The Encyclopedia';
+        $sub_heading  = 'CATALOGUS OMNIUM // VAULT OF RECORDED LORE';
+        if (!empty($type_slug)) {
+            foreach ($entry_types as $et) {
+                if ($et->slug === $type_slug) {
+                    $header_title = $et->name;
+                    $sub_heading  = 'CODEX CATEGORY // ' . strtoupper($et->name);
+                    break;
+                }
+            }
+        }
 
         $data = array(
-            'page_title'     => 'The Encyclopedia',
-            'header_title'   => 'The Encyclopedia',
-            'sub_heading'    => 'CATALOGUS OMNIUM // VAULT OF RECORDED LORE',
+            'page_title'     => $header_title,
+            'header_title'   => $header_title,
+            'sub_heading'    => $sub_heading,
             'header_caption' => 'Master Index of Recorded Entities, Artifacts, and Chronicles',
-            'active_tab'     => !empty($type_slug) ? $type_slug : 'dashboard',
+            'active_tab'     => !empty($type_slug) ? $type_slug : 'encyclopedia',
             'active_world'   => $active_world,
             'entries'        => $entries,
             'entry_types'    => $entry_types,
+            'all_tags'       => $all_tags,
+            'search_query'   => $search,
             'selected_type'  => $type_slug,
             'selected_status'=> $status,
+            'selected_tag'   => $tag_slug,
+            'selected_sort'  => $sort,
+            'total_entries'  => $total_entries,
+            'canon_count'    => $canon_count,
+            'draft_count'    => $draft_count,
             'content_view'   => 'entries/index',
         );
 
