@@ -56,8 +56,9 @@ class Migrate extends CI_Controller {
                 <li><code>property_definitions</code> &amp; <code>property_values</code></li>
                 <li><code>entry_relationships</code></li>
                 <li><code>tags</code> &amp; <code>entry_tags</code></li>
-                <li><code>timeline_events</code></li>
+                <li><code>timeline_events</code> (with Fictional Calendar <code>sort_year</code> / <code>end_year</code>)</li>
                 <li><code>media_attachments</code></li>
+                <li><code>app_settings</code></li>
             </ul>';
             echo '<p><a href="' . base_url() . '">&larr; Return to Application</a></p>';
         }
