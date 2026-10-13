@@ -102,6 +102,46 @@
       background: radial-gradient(circle at 35% 35%, #A53232 0%, #752222 55%, #4A1414 100%);
       box-shadow: inset 0 1px 2px rgba(255,255,255,0.25), 3px 3px 0 #08070A;
     }
+
+    /* Book-Shaped Grimoire Tome Card */
+    .tome-card {
+      position: relative;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      box-shadow:
+        3px 3px 0 #151419,
+        4px 4px 0 #8E887E,
+        6px 6px 0 #151419,
+        7px 7px 0 #6E5A2D,
+        10px 10px 0 #08070A;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .tome-card:hover {
+      transform: translateY(-5px);
+      box-shadow:
+        3px 5px 0 #151419,
+        4px 6px 0 #C5A869,
+        6px 8px 0 #151419,
+        7px 9px 0 #856E3B,
+        12px 14px 0 #08070A;
+    }
+    .tome-spine {
+      position: relative;
+      background: linear-gradient(90deg, #08070A 0%, #272630 45%, #111014 85%, #3D382F 100%);
+    }
+    .tome-spine::before,
+    .tome-spine::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 6px;
+      border-top: 1px solid #C5A869;
+      border-bottom: 1px solid #C5A869;
+      background: rgba(197, 168, 105, 0.2);
+    }
+    .tome-spine::before { top: 20px; }
+    .tome-spine::after { bottom: 20px; }
   </style>
 </head>
 <body class="bg-grimoire-weave text-parchment font-prose min-h-screen selection:bg-gold selection:text-paper-ink flex flex-col justify-between">

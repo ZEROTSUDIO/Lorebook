@@ -1,5 +1,5 @@
 <!-- HEADER / NAVIGATION (Dossier Title Bar with Ancient Regalia) -->
-<header class="flex flex-col items-center gap-5 text-center border-b-2 border-paper-line pb-8">
+<header class="flex flex-col items-center gap-5 text-center <?php echo !empty($hide_header_banner) ? 'pb-2' : 'border-b-2 border-paper-line pb-8'; ?>">
   
   <!-- SUB-NAVIGATION BAR WITH SHARP TABS -->
   <nav class="flex flex-wrap justify-center gap-2 font-mono text-xs uppercase tracking-widest text-ash">
@@ -7,7 +7,7 @@
       $current_tab = isset($active_tab) ? $active_tab : 'dashboard';
     ?>
     <a href="<?php echo base_url('dashboard'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'dashboard') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> flex items-center gap-2 transition">
-      <span class="w-1.5 h-1.5 bg-gold rotate-45 inline-block"></span> FIELD JOURNAL
+      <span class="w-1.5 h-1.5 bg-gold rotate-45 inline-block"></span> WORLD ATLAS
     </a>
     <a href="<?php echo base_url('entries'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'encyclopedia') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
       ALL RECORDS
@@ -32,6 +32,7 @@
     </a>
   </nav>
 
+  <?php if (empty($hide_header_banner)): ?>
   <!-- HEADLINE & ANCIENT HERALDRY -->
   <div class="mt-2 flex flex-col items-center">
     <div class="font-mono text-[11px] uppercase tracking-[0.35em] text-copper mb-2 flex items-center gap-2">
@@ -55,4 +56,5 @@
     <span class="w-2 h-2 border border-gold rotate-45"></span>
     <span class="flex-1 h-px bg-paper-line"></span>
   </div>
+  <?php endif; ?>
 </header>
