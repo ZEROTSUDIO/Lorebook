@@ -144,24 +144,30 @@ lorekeeper/
 ### Milestone 1: Project Foundation & World Scoping (Completed)
 - [x] UI Prototype and Design Language established (`mockup-zerostudios.html`).
 - [x] Initialize clean CodeIgniter 3 structure in `c:\xampp\htdocs\Lorekeeper`.
-- [x] Implement database migrations (`001` through `009`) including `users`, `world_members`, `worlds`, `entry_types`, `entries`, `properties`, `relationships`, `tags`, `timeline`, and `media`.
+- [x] Implement database migrations (`001` through `010`) including `users`, `world_members`, `worlds`, `entry_types`, `entries`, `properties`, `relationships`, `tags`, `timeline`, `media`, and `app_settings`.
 - [x] Build modular layout shell (`head`, `topbar`, `header`, `footer`, `layouts/main`) and auto-seeding `Dashboard`.
+- [x] Dynamic World Compendium & Atlas preferences via `app_settings` per world.
+- [x] World Switcher dropdown & Multi-World Genesis creator (`worlds/create`).
+- [x] User / Author attribution system (`Archivist Zerotsu`) across dossiers, header, and cards.
 
-### Milestone 2: Encyclopedia CRUD & Custom Attributes (In Progress)
+### Milestone 2: Encyclopedia CRUD & Custom Attributes (Completed)
 - [x] Build entry creation (`entries/create`) and detail dossier view (`entries/view`).
-- [ ] Build Encyclopedia Browser (`entries/index`) with search and multi-attribute filters (Type, Status, Tag).
-- [ ] Build entry editing (`entries/edit`), updating, and soft-archiving.
-- [ ] Implement schema-driven template & property manager UI (add/edit custom fields per entry type).
+- [x] Build Encyclopedia Browser (`entries/index`) with search and multi-attribute filters (Type, Status, Tag, Sorting).
+- [x] Build entry editing (`entries/edit`), updating, and soft-archiving/restore protocol (`entries/archive`, `entries/restore`).
+- [x] Implement Grimoire Markdown Engine (`Markdown_parser.php`) with drop-caps, ornamental dividers, blockquotes, and live AJAX preview.
+- [x] Bidirectional `[[Wiki Link]]` resolution with gold links for canon entries and copper `[＋]` redlinks for unwritten concepts.
+- [ ] Dedicated Schema-driven template & property manager UI (dedicated manager to add/remove custom property definitions per entry type outside of code seeds).
 
-### Milestone 3: Dual Editor & Media Vault
-- [ ] Integrate local WYSIWYG editor with lossless Markdown two-way conversion.
-- [ ] Secure local image upload system with hashed filenames and metadata tracking.
-- [ ] Internal wiki link resolution (`lore://entry/<uuid>`) with broken-reference detection.
+### Milestone 3: Directed Relationships & Chronology (In Progress)
+- [x] Automatic backlink index on every entry page (`entries/view.php`).
+- [x] 3-Layer Fictional Calendar DB Schema (`sort_year`, `end_year`, `is_approximate`).
+- [x] Frontispiece Chronology Ribbon on Dashboard (horizontal chronological node tape).
+- [ ] Dedicated Chronological Timeline Hub (`/timeline` or `/entries/chronology`) with era grouping and filtering.
+- [ ] Directed Relationship Matrix UI (inter-entity connection binder: `is_ruler_of`, `sworn_ally_to`, `nemesis_of`, etc.).
 
-### Milestone 4: Directed Relationships & Chronology
-- [ ] Interactive relationship manager with inverse relationship labels.
-- [ ] Automatic backlink index on every entry page.
-- [ ] Chronological event timeline supporting custom fictional calendars.
+### Milestone 4: Media Vault & Attachments
+- [ ] Secure local image upload system (`media_attachments`) with hashed filenames and metadata tracking.
+- [ ] Dropzone / File picker for dossier portraits and cartography plates instead of SVG placeholders.
 
 ### Milestone 5: Backup, Portability & Future Expansion
 - [ ] Complete ZIP export package (`manifest.json`, structured data, Markdown, and media).
