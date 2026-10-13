@@ -201,9 +201,9 @@
           <?php endif; ?>
         </div>
 
-        <!-- ARTICLE PROSE (CANONICAL MARKDOWN) -->
-        <div class="font-prose text-base sm:text-lg leading-relaxed text-parchment flex flex-col gap-5 whitespace-pre-wrap">
-          <?php echo html_escape($entry->content_markdown); ?>
+        <!-- ARTICLE PROSE (ILLUMINATED GRIMOIRE ENGINE) -->
+        <div class="prose-grimoire">
+          <?php echo isset($parsed_content) ? $parsed_content : nl2br(html_escape($entry->content_markdown)); ?>
         </div>
 
         <!-- ARTICLE FOOTER & TAGS -->
@@ -212,8 +212,13 @@
             <div class="flex items-center gap-2">
               <span class="text-gold font-bold">TAGS:</span>
               <?php foreach ($tags as $t): ?>
-                <span class="border border-paper-line px-2 py-0.5 bg-paper-base text-parchment">#<?php echo html_escape($t->name); ?></span>
+                <a href="<?php echo base_url('entries?tag=' . urlencode($t->slug)); ?>" class="border border-paper-line hover:border-gold px-2 py-0.5 bg-paper-base text-parchment hover:text-gold transition">
+                  #<?php echo html_escape($t->name); ?>
+                </a>
               <?php endforeach; ?>
+            </div>
+            <div class="text-[11px] text-ash">
+              LAST AMENDED: <?php echo date('Y-m-d H:i', strtotime($entry->updated_at)); ?>
             </div>
           </div>
         <?php endif; ?>
@@ -221,6 +226,42 @@
       </div>
 
     </article>
+
+    <!-- BACKLINKS / REFERENCED IN OTHER CHRONICLES -->
+    <?php if (!empty($backlinks)): ?>
+      <section class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
+        <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex items-center justify-between text-xs font-mono">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-copper rotate-45"></span>
+            <span class="text-gold font-bold tracking-widest uppercase">REFERENCED IN OTHER CHRONICLES // BACKLINKS</span>
+          </div>
+          <span class="text-ash text-[10px]"><?php echo count($backlinks); ?> REFERENCES DETECTED</span>
+        </div>
+
+        <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <?php foreach ($backlinks as $bl): ?>
+            <a href="<?php echo base_url('entries/view/' . $bl->id); ?>" class="bg-paper-base border border-paper-line hover:border-gold p-3.5 shadow-ink-sm flex flex-col justify-between group transition">
+              <div>
+                <div class="flex items-center justify-between font-mono text-[10px] text-copper mb-1">
+                  <span class="uppercase tracking-wider"><?php echo html_escape($bl->type_name); ?></span>
+                  <span class="text-ash">FOLIO // CAN-<?php echo sprintf('%03d', (int)$bl->id); ?></span>
+                </div>
+                <h4 class="font-display font-bold text-xl uppercase tracking-wide text-parchment group-hover:text-gold transition">
+                  <?php echo html_escape($bl->title); ?>
+                </h4>
+                <p class="font-prose text-xs text-parchment-dim mt-1.5 leading-relaxed italic line-clamp-2">
+                  “<?php echo html_escape($bl->snippet); ?>”
+                </p>
+              </div>
+              <div class="border-t border-paper-line/80 pt-2 mt-3 flex items-center justify-between font-mono text-[10px] text-ash">
+                <span class="group-hover:text-gold transition">CONSULT RECORD &rarr;</span>
+                <span class="text-gold">✦</span>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </section>
+    <?php endif; ?>
 
   </main>
 

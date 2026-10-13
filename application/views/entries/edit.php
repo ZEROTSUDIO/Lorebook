@@ -202,22 +202,34 @@
 
         <article class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
           
-          <!-- DOSSIER TITLE BAR WITH SCRIBE TOOLS -->
-          <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-3 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
-            <div class="flex items-center gap-2">
-              <span class="text-gold">✦</span>
-              <span class="tracking-widest uppercase font-bold text-parchment">CHRONICLE MANUSCRIPT</span>
-              <span class="text-paper-line">|</span>
-              <span class="text-ash">MARKDOWN SCRIBE</span>
+          <!-- DOSSIER TITLE BAR WITH SCRIBE TOOLS & TABS -->
+          <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-3 flex flex-wrap items-center justify-between text-xs font-mono gap-3">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
+                <span class="text-gold">✦</span>
+                <span class="tracking-widest uppercase font-bold text-parchment">CHRONICLE MANUSCRIPT</span>
+              </div>
+
+              <!-- View/Edit Tabs -->
+              <div class="flex items-center border border-paper-line p-0.5 bg-paper-deep text-[11px]">
+                <button type="button" id="tab-write" onclick="toggleEditorTab('write')" class="px-2.5 py-0.5 font-bold bg-gold text-paper-ink uppercase transition">
+                  [✎ WRITE]
+                </button>
+                <button type="button" id="tab-preview" onclick="toggleEditorTab('preview')" class="px-2.5 py-0.5 text-ash hover:text-parchment uppercase transition">
+                  [👁 PREVIEW]
+                </button>
+              </div>
             </div>
             
-            <!-- Quick Toolbar Hints -->
-            <div class="flex items-center gap-1.5 text-[11px]">
-              <span class="border border-paper-line px-1.5 py-0.5 bg-paper-deep text-ash"># H1</span>
-              <span class="border border-paper-line px-1.5 py-0.5 bg-paper-deep text-ash">## H2</span>
-              <span class="border border-paper-line px-1.5 py-0.5 bg-paper-deep text-ash">**B**</span>
-              <span class="border border-paper-line px-1.5 py-0.5 bg-paper-deep text-ash">&gt; Quote</span>
-              <span class="border border-gold/50 px-1.5 py-0.5 bg-paper-deep text-gold font-bold">[[Wiki Link]]</span>
+            <!-- Interactive Formatting Toolbar -->
+            <div class="flex flex-wrap items-center gap-1 text-[11px]" id="editor-toolbar">
+              <button type="button" onclick="insertSyntax('## ', '')" title="Section Heading" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold transition">## H2</button>
+              <button type="button" onclick="insertSyntax('### ', '')" title="Subsection Heading" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold transition">### H3</button>
+              <button type="button" onclick="wrapSelection('**', '**')" title="Bold" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold font-bold transition">B</button>
+              <button type="button" onclick="wrapSelection('*', '*')" title="Italic" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold italic transition">I</button>
+              <button type="button" onclick="insertSyntax('> ', '')" title="Blockquote" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold transition">&gt; Quote</button>
+              <button type="button" onclick="insertSyntax('- ', '')" title="Bullet List" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold transition">• List</button>
+              <button type="button" onclick="insertWikiLink()" title="Insert Wiki Link to another entry" class="border border-gold/60 hover:border-gold px-2 py-0.5 bg-paper-deep text-gold font-bold transition">✦ [[Wiki Link]]</button>
             </div>
           </div>
 
@@ -232,13 +244,24 @@
               <textarea name="summary" id="summary" rows="2" placeholder="A concise overview of the character, realm, or artifact..." class="w-full bg-paper-base border-2 border-paper-line focus:border-gold p-3 text-parchment font-prose text-base leading-relaxed outline-none transition placeholder:text-ash/40 resize-y"><?php echo set_value('summary', $entry->summary); ?></textarea>
             </div>
 
-            <!-- FULL ARTICLE BODY (MARKDOWN) -->
-            <div class="flex flex-col gap-2 font-mono text-xs">
+            <!-- FULL ARTICLE BODY (MARKDOWN EDITOR CONTAINER) -->
+            <div class="flex flex-col gap-2 font-mono text-xs" id="editor-write-container">
               <label for="content_markdown" class="text-gold uppercase font-bold tracking-wider flex items-center justify-between">
                 <span>FULL ARTICLE BODY (MARKDOWN) *</span>
-                <span class="text-ash text-[10px]">CANONICAL PROSE</span>
+                <span class="text-ash text-[10px]">CANONICAL PROSE // USE [[ENTRY NAME]] TO CROSS-REFERENCE</span>
               </label>
               <textarea name="content_markdown" id="content_markdown" rows="20" placeholder="Inscribe your detailed lore, backstory, relationships, and historical records here using Markdown..." class="w-full bg-paper-base border-2 border-paper-line focus:border-gold p-4 text-parchment font-prose text-base sm:text-lg leading-relaxed outline-none transition placeholder:text-ash/40 resize-y font-mono text-sm"><?php echo set_value('content_markdown', $entry->content_markdown); ?></textarea>
+            </div>
+
+            <!-- LIVE PREVIEW CONTAINER (HIDDEN INITIALLY) -->
+            <div id="editor-preview-container" class="hidden flex flex-col gap-2">
+              <div class="font-mono text-xs text-gold uppercase tracking-wider flex items-center justify-between border-b border-paper-line pb-2">
+                <span>ILLUMINATED CODEX PREVIEW</span>
+                <span class="text-[10px] text-ash">RESOLVED [[WIKI LINKS]] &amp; TYPOGRAPHY</span>
+              </div>
+              <div id="preview-render-target" class="p-5 bg-paper-deep border-2 border-paper-line min-h-[350px] shadow-ink-sm prose-grimoire">
+                <!-- Rendered output appears here -->
+              </div>
             </div>
 
             <!-- ACTION BAR -->
@@ -264,7 +287,7 @@
 
 </div>
 
-<!-- JAVASCRIPT: DYNAMIC PROPERTY TOGGLE -->
+<!-- JAVASCRIPT: DYNAMIC PROPERTY TOGGLE & MARKDOWN TOOLBAR -->
 <script>
 function switchEntryTypeProps(typeId) {
   const groups = document.querySelectorAll('.type-props-group');
@@ -273,6 +296,96 @@ function switchEntryTypeProps(typeId) {
   const activeContainer = document.getElementById('props-container-' + typeId);
   if (activeContainer) {
     activeContainer.classList.remove('hidden');
+  }
+}
+
+// Markdown Toolbar Helpers
+function getEditor() {
+  return document.getElementById('content_markdown');
+}
+
+function wrapSelection(prefix, suffix) {
+  const editor = getEditor();
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const text = editor.value;
+  const selected = text.substring(start, end) || 'text';
+  
+  editor.value = text.substring(0, start) + prefix + selected + suffix + text.substring(end);
+  editor.focus();
+  editor.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+}
+
+function insertSyntax(prefix, suffix) {
+  const editor = getEditor();
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const text = editor.value;
+  
+  editor.value = text.substring(0, start) + prefix + suffix + text.substring(start);
+  editor.focus();
+  editor.setSelectionRange(start + prefix.length, start + prefix.length);
+}
+
+function insertWikiLink() {
+  const editor = getEditor();
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const text = editor.value;
+  const selected = text.substring(start, end);
+  
+  if (selected) {
+    wrapSelection('[[', ']]');
+  } else {
+    const title = prompt('Enter record name to cross-reference (e.g. Ilsabet Voss, The Frost Keep):');
+    if (title) {
+      editor.value = text.substring(0, start) + '[[' + title + ']]' + text.substring(start);
+      editor.focus();
+    }
+  }
+}
+
+// Write vs Live Preview Tabs
+function toggleEditorTab(mode) {
+  const writeTab = document.getElementById('tab-write');
+  const previewTab = document.getElementById('tab-preview');
+  const writeContainer = document.getElementById('editor-write-container');
+  const previewContainer = document.getElementById('editor-preview-container');
+  const renderTarget = document.getElementById('preview-render-target');
+  const toolbar = document.getElementById('editor-toolbar');
+
+  if (mode === 'preview') {
+    writeTab.className = 'px-2.5 py-0.5 text-ash hover:text-parchment uppercase transition';
+    previewTab.className = 'px-2.5 py-0.5 font-bold bg-gold text-paper-ink uppercase transition';
+    writeContainer.classList.add('hidden');
+    previewContainer.classList.remove('hidden');
+    toolbar.classList.add('opacity-40', 'pointer-events-none');
+
+    renderTarget.innerHTML = '<div class="flex items-center gap-2 text-ash font-mono text-xs"><span class="w-2 h-2 bg-gold animate-spin"></span> Consulting archives & rendering manuscript...</div>';
+
+    const markdown = getEditor().value;
+    const formData = new FormData();
+    formData.append('markdown', markdown);
+
+    fetch('<?php echo base_url("entries/preview"); ?>', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      renderTarget.innerHTML = data.html || '<p class="text-ash italic">No content to preview.</p>';
+    })
+    .catch(() => {
+      renderTarget.innerHTML = '<p class="text-crimson font-mono text-xs">Failed to load manuscript preview.</p>';
+    });
+
+  } else {
+    previewTab.className = 'px-2.5 py-0.5 text-ash hover:text-parchment uppercase transition';
+    writeTab.className = 'px-2.5 py-0.5 font-bold bg-gold text-paper-ink uppercase transition';
+    previewContainer.classList.add('hidden');
+    writeContainer.classList.remove('hidden');
+    toolbar.classList.remove('opacity-40', 'pointer-events-none');
+    getEditor().focus();
   }
 }
 </script>

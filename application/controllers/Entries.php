@@ -145,6 +145,8 @@ class Entries extends CI_Controller {
             $properties_by_type[$type->id] = $props;
         }
 
+        $initial_title = $this->input->get('title', TRUE);
+
         $data = array(
             'page_title'         => 'Inscribe Entry',
             'header_title'       => 'Inscribe Entry',
@@ -154,6 +156,7 @@ class Entries extends CI_Controller {
             'active_world'       => $active_world,
             'entry_types'        => $entry_types,
             'properties_by_type' => $properties_by_type,
+            'initial_title'      => $initial_title,
             'content_view'       => 'entries/create',
         );
 
@@ -289,6 +292,42 @@ class Entries extends CI_Controller {
 
         $active_world = $this->db->get_where('worlds', array('id' => $world_id))->row();
 
+        // 1. Parse Markdown & [[Wiki Links]] via Grimoire Engine
+        $this->load->library('markdown_parser');
+        $parsed_content = $this->markdown_parser->parse($entry->content_markdown, $world_id);
+
+        // 2. Query Backlinks (Other entries referencing this entry's title or slug)
+        $escaped_title = $this->db->escape_like_str($entry->title);
+        $escaped_slug  = $this->db->escape_like_str($entry->slug);
+
+        $this->db->select('entries.id, entries.title, entries.slug, entries.summary, entries.content_markdown, entry_types.name as type_name, entry_types.slug as type_slug');
+        $this->db->from('entries');
+        $this->db->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left');
+        $this->db->where('entries.world_id', $world_id);
+        $this->db->where('entries.id !=', $id);
+        $this->db->where('entries.is_archived', 0);
+        $this->db->group_start();
+        $this->db->like('entries.content_markdown', '[[' . $escaped_title);
+        $this->db->or_like('entries.content_markdown', '[[' . $escaped_slug);
+        $this->db->group_end();
+        $this->db->limit(8);
+        $backlinks = $this->db->get()->result();
+
+        // Extract excerpt snippet for each backlink
+        foreach ($backlinks as $bl) {
+            $pos = stripos($bl->content_markdown, '[[' . $entry->title);
+            if ($pos === false) {
+                $pos = stripos($bl->content_markdown, '[[' . $entry->slug);
+            }
+            if ($pos !== false) {
+                $start = max(0, $pos - 50);
+                $snippet = substr($bl->content_markdown, $start, 150);
+                $bl->snippet = ($start > 0 ? '...' : '') . trim($snippet) . '...';
+            } else {
+                $bl->snippet = $bl->summary;
+            }
+        }
+
         $data = array(
             'page_title'     => $entry->title,
             'header_title'   => $entry->title,
@@ -299,10 +338,26 @@ class Entries extends CI_Controller {
             'entry'          => $entry,
             'properties'     => $properties,
             'tags'           => $tags,
+            'parsed_content' => $parsed_content,
+            'backlinks'      => $backlinks,
             'content_view'   => 'entries/view',
         );
 
         $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * AJAX Live Markdown & Wiki Link Preview Endpoint
+     */
+    public function preview()
+    {
+        $world_id = $this->session->userdata('active_world_id') ?: 1;
+        $this->load->library('markdown_parser');
+        $raw_markdown = $this->input->post('markdown');
+        $html = $this->markdown_parser->parse($raw_markdown, $world_id);
+        $this->output
+             ->set_content_type('application/json')
+             ->set_output(json_encode(array('html' => $html)));
     }
 
     /**
