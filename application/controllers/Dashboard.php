@@ -23,6 +23,13 @@ class Dashboard extends CI_Controller {
             }
         }
 
+        // Fetch current archivist user
+        $user_id = $this->session->userdata('user_id');
+        $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
+        if ($current_user && !$user_id) {
+            $this->session->set_userdata('user_id', $current_user->id);
+        }
+
         // 2. Fetch live stats, Tome categories, Featured Spotlight, Recent Entries, and Timeline Events
         $total_entries = 0;
         $canon_count = 0;
@@ -74,10 +81,11 @@ class Dashboard extends CI_Controller {
                 $vol_idx++;
             }
 
-            // Fetch Notable / Recent Entries for exploration grid
-            $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug');
+            // Fetch Notable / Recent Entries for exploration grid with Author attribution
+            $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug, users.display_name as author_name, users.username as author_username');
             $this->db->from('entries');
             $this->db->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left');
+            $this->db->join('users', 'users.id = entries.created_by', 'left');
             $this->db->where('entries.world_id', $wid);
             $this->db->where('entries.is_archived', 0);
             $this->db->order_by('entries.id', 'ASC');
@@ -91,9 +99,10 @@ class Dashboard extends CI_Controller {
             if ($spotlight_mode === 'random' && !empty($recent_entries)) {
                 $featured_entry = $recent_entries[array_rand($recent_entries)];
             } elseif ($spotlight_id > 0) {
-                $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug');
+                $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug, users.display_name as author_name, users.username as author_username');
                 $this->db->from('entries');
                 $this->db->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left');
+                $this->db->join('users', 'users.id = entries.created_by', 'left');
                 $this->db->where(array('entries.id' => $spotlight_id, 'entries.world_id' => $wid));
                 $featured_entry = $this->db->get()->row();
             }
@@ -148,6 +157,7 @@ class Dashboard extends CI_Controller {
             'hide_header_banner' => TRUE,
             'active_tab'         => 'dashboard',
             'active_world'       => $active_world,
+            'current_user'       => $current_user,
             'current_cycle'      => $current_cycle,
             'world_settings'     => $world_settings,
             'total_entries'      => $total_entries,
@@ -225,12 +235,15 @@ class Dashboard extends CI_Controller {
         }
 
         $world_settings = $this->get_world_settings($world_id);
+        $user_id = $this->session->userdata('user_id');
+        $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
 
         $data = array(
             'page_title'         => 'Compendium Settings // ' . $active_world->name,
             'hide_header_banner' => TRUE,
             'active_tab'         => 'dashboard',
             'active_world'       => $active_world,
+            'current_user'       => $current_user,
             'world_settings'     => $world_settings,
             'content_view'       => 'dashboard/settings',
         );
@@ -278,10 +291,10 @@ class Dashboard extends CI_Controller {
         if ($user_count === 0) {
             $user_data = array(
                 'public_id'     => $this->generate_uuid(),
-                'username'      => 'weng',
-                'email'         => 'weng@zerotsudio.com',
+                'username'      => 'Zerotsu',
+                'email'         => 'zerotsu@zerotsudios.com',
                 'password_hash' => password_hash('lorekeeper', PASSWORD_DEFAULT),
-                'display_name'  => 'Scribe Weng',
+                'display_name'  => 'Archivist Zerotsu',
                 'role'          => 'admin',
                 'is_active'     => 1,
                 'created_at'    => date('Y-m-d H:i:s'),

@@ -234,8 +234,12 @@
           </div>
 
           <!-- CARD FOOTER -->
-          <div class="border-t-2 border-paper-line px-5 py-3 bg-paper-base/50 flex items-center justify-between font-mono text-[11px]">
-            <span class="text-ash">UPDATED: <?php echo date('M d, Y', strtotime($entry->updated_at)); ?></span>
+          <div class="border-t-2 border-paper-line px-5 py-3 bg-paper-base/50 flex flex-wrap items-center justify-between font-mono text-[11px] gap-2">
+            <div class="flex items-center gap-2 text-ash">
+              <span>SCRIBE: <strong class="text-parchment"><?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : 'Archivist Zerotsu'); ?></strong></span>
+              <span class="text-paper-line">•</span>
+              <span>UPDATED: <?php echo date('M d, Y', strtotime($entry->updated_at)); ?></span>
+            </div>
             <a href="<?php echo base_url('entries/view/' . $entry->id); ?>" class="text-gold font-bold hover:underline uppercase tracking-wider">
               OPEN DOSSIER &rarr;
             </a>

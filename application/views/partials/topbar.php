@@ -13,7 +13,20 @@
   </div>
   
   <!-- Archival Status & Quick Controls -->
-  <div class="flex items-center gap-4 text-[11px]">
+  <div class="flex items-center gap-3 sm:gap-4 text-[11px]">
+    <!-- Scribe / Archivist Badge -->
+    <?php if (isset($current_user) && !empty($current_user)): ?>
+      <div class="flex items-center gap-1.5 border border-gold/60 px-2 py-0.5 bg-paper-panel text-gold shadow-ink-sm" title="Logged in as <?php echo html_escape($current_user->username); ?>">
+        <span class="w-1.5 h-1.5 bg-gold rotate-45"></span>
+        <span class="uppercase tracking-wider font-bold">
+          SCRIBE: <?php echo html_escape($current_user->display_name ? $current_user->display_name : $current_user->username); ?>
+        </span>
+        <span class="text-[9px] text-copper px-1 border border-copper/50 hidden lg:inline">
+          <?php echo strtoupper(html_escape($current_user->role ? $current_user->role : 'SCRIBE')); ?>
+        </span>
+      </div>
+    <?php endif; ?>
+
     <span class="hidden md:inline text-parchment-dim">
       CANON INDEX: <strong class="text-parchment"><?php echo isset($canon_count) ? (int)$canon_count : 0; ?> ENTRIES</strong>
     </span>

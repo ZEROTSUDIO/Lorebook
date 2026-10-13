@@ -177,7 +177,11 @@
           <span class="text-paper-line">|</span>
           <span class="text-ash"><?php echo html_escape($entry->type_name); ?></span>
         </div>
-        <div class="flex items-center gap-2 text-ash text-[11px]">
+        <div class="flex items-center gap-3 text-ash text-[11px]">
+          <span class="text-gold font-bold">
+            SCRIBE: <?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : (!empty($entry->author_username) ? $entry->author_username : 'Archivist Zerotsu')); ?>
+          </span>
+          <span class="text-paper-line">|</span>
           <span>RECORDED: <?php echo date('M d, Y', strtotime($entry->created_at)); ?></span>
           <span class="text-paper-line">|</span>
           <span class="text-copper font-bold uppercase"><?php echo html_escape($entry->status); ?></span>
@@ -188,8 +192,9 @@
         
         <!-- ARTICLE HEADER -->
         <div class="border-b-2 border-paper-line pb-6">
-          <div class="font-mono text-xs uppercase tracking-widest text-copper mb-1">
-            RECORD OF CANAAN · PUBLIC ID: <?php echo html_escape($entry->public_id); ?>
+          <div class="font-mono text-xs uppercase tracking-widest text-copper mb-1 flex items-center justify-between">
+            <span>RECORD OF CANAAN · PUBLIC ID: <?php echo html_escape($entry->public_id); ?></span>
+            <span class="text-ash text-[10px]">INSCRIBED BY <?php echo strtoupper(html_escape(!empty($entry->author_name) ? $entry->author_name : 'ARCHIVIST ZEROTSU')); ?></span>
           </div>
           <h1 class="font-display font-bold text-3xl sm:text-5xl text-gold tracking-wide uppercase leading-tight">
             <?php echo html_escape($entry->title); ?>
@@ -206,22 +211,28 @@
           <?php echo isset($parsed_content) ? $parsed_content : nl2br(html_escape($entry->content_markdown)); ?>
         </div>
 
-        <!-- ARTICLE FOOTER & TAGS -->
-        <?php if (!empty($tags)): ?>
-          <div class="border-t-2 border-paper-line pt-4 flex flex-wrap items-center justify-between font-mono text-xs text-ash gap-3">
-            <div class="flex items-center gap-2">
-              <span class="text-gold font-bold">TAGS:</span>
+        <!-- ARTICLE FOOTER & METADATA LEDGER -->
+        <div class="border-t-2 border-paper-line pt-4 flex flex-col sm:flex-row sm:items-center justify-between font-mono text-xs text-ash gap-3">
+          <div class="flex items-center gap-2">
+            <span class="text-gold font-bold">TAGS:</span>
+            <?php if (!empty($tags)): ?>
               <?php foreach ($tags as $t): ?>
                 <a href="<?php echo base_url('entries?tag=' . urlencode($t->slug)); ?>" class="border border-paper-line hover:border-gold px-2 py-0.5 bg-paper-base text-parchment hover:text-gold transition">
                   #<?php echo html_escape($t->name); ?>
                 </a>
               <?php endforeach; ?>
-            </div>
-            <div class="text-[11px] text-ash">
-              LAST AMENDED: <?php echo date('Y-m-d H:i', strtotime($entry->updated_at)); ?>
-            </div>
+            <?php else: ?>
+              <span class="text-ash/60 italic text-[11px]">No tags indexed</span>
+            <?php endif; ?>
           </div>
-        <?php endif; ?>
+          <div class="flex items-center gap-3 text-[11px] text-ash">
+            <span>SCRIBE: <strong class="text-parchment"><?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : 'Archivist Zerotsu'); ?></strong></span>
+            <?php if (!empty($entry->updater_name) && $entry->updater_name !== $entry->author_name): ?>
+              <span>• REVISED BY: <strong class="text-copper"><?php echo html_escape($entry->updater_name); ?></strong></span>
+            <?php endif; ?>
+            <span>• AMENDED: <?php echo date('Y-m-d H:i', strtotime($entry->updated_at)); ?></span>
+          </div>
+        </div>
 
       </div>
 

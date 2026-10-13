@@ -23,9 +23,10 @@ class Entries extends CI_Controller {
         $tag_slug  = trim((string)$this->input->get('tag', TRUE));
         $sort      = trim((string)$this->input->get('sort', TRUE)) ?: 'updated_desc';
 
-        $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug');
+        $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug, users.display_name as author_name, users.username as author_username');
         $this->db->from('entries');
         $this->db->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left');
+        $this->db->join('users', 'users.id = entries.created_by', 'left');
 
         if (!empty($tag_slug)) {
             $this->db->join('entry_tags', 'entry_tags.entry_id = entries.id', 'inner');
@@ -100,6 +101,9 @@ class Entries extends CI_Controller {
             }
         }
 
+        $user_id = $this->session->userdata('user_id');
+        $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
+
         $data = array(
             'page_title'     => $header_title,
             'header_title'   => $header_title,
@@ -107,6 +111,7 @@ class Entries extends CI_Controller {
             'header_caption' => 'Master Index of Recorded Entities, Artifacts, and Chronicles',
             'active_tab'     => !empty($type_slug) ? $type_slug : 'encyclopedia',
             'active_world'   => $active_world,
+            'current_user'   => $current_user,
             'entries'        => $entries,
             'entry_types'    => $entry_types,
             'all_tags'       => $all_tags,
@@ -147,6 +152,9 @@ class Entries extends CI_Controller {
 
         $initial_title = $this->input->get('title', TRUE);
 
+        $user_id = $this->session->userdata('user_id');
+        $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
+
         $data = array(
             'page_title'         => 'Inscribe Entry',
             'header_title'       => 'Inscribe Entry',
@@ -154,6 +162,7 @@ class Entries extends CI_Controller {
             'header_caption'     => 'Record a new person, seat of power, sacred relic, or historical event',
             'active_tab'         => 'create',
             'active_world'       => $active_world,
+            'current_user'       => $current_user,
             'entry_types'        => $entry_types,
             'properties_by_type' => $properties_by_type,
             'initial_title'      => $initial_title,
@@ -264,9 +273,11 @@ class Entries extends CI_Controller {
     public function view($id)
     {
         $world_id = $this->session->userdata('active_world_id');
-        $entry = $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug')
+        $entry = $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug, creator.display_name as author_name, creator.username as author_username, creator.role as author_role, updater.display_name as updater_name, updater.username as updater_username')
                           ->from('entries')
                           ->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left')
+                          ->join('users as creator', 'creator.id = entries.created_by', 'left')
+                          ->join('users as updater', 'updater.id = entries.updated_by', 'left')
                           ->where('entries.id', $id)
                           ->where('entries.world_id', $world_id)
                           ->get()->row();
@@ -328,6 +339,9 @@ class Entries extends CI_Controller {
             }
         }
 
+        $user_id = $this->session->userdata('user_id');
+        $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
+
         $data = array(
             'page_title'     => $entry->title,
             'header_title'   => $entry->title,
@@ -335,6 +349,7 @@ class Entries extends CI_Controller {
             'header_caption' => 'Codex Entry Public ID: ' . $entry->public_id,
             'active_tab'     => $entry->type_slug,
             'active_world'   => $active_world,
+            'current_user'   => $current_user,
             'entry'          => $entry,
             'properties'     => $properties,
             'tags'           => $tags,
@@ -407,6 +422,9 @@ class Entries extends CI_Controller {
         }
         $saved_tags = implode(', ', $tag_names);
 
+        $user_id = $this->session->userdata('user_id');
+        $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
+
         $data = array(
             'page_title'         => 'Edit ' . $entry->title,
             'header_title'       => 'Edit Codex Record',
@@ -414,6 +432,7 @@ class Entries extends CI_Controller {
             'header_caption'     => 'Revising recorded history for Public ID: ' . $entry->public_id,
             'active_tab'         => $entry->type_slug,
             'active_world'       => $active_world,
+            'current_user'       => $current_user,
             'entry'              => $entry,
             'entry_types'        => $entry_types,
             'properties_by_type' => $properties_by_type,

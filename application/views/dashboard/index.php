@@ -123,7 +123,7 @@
         <!-- Bottom Plate Caption Strip -->
         <div class="relative z-10 flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono text-ash border-t border-paper-line/80 pt-3">
           <span>ENGRAVING: THE WATCHTOWERS OF THE NORTHERN CRAGS (SOLSTICE OF 842 2A)</span>
-          <span>ARCHIVIST: SCRIBE WENG // VERIFIED CANON: <?php echo (int)$canon_count; ?> OF <?php echo (int)$total_entries; ?></span>
+          <span>ARCHIVIST: <?php echo strtoupper(html_escape(isset($current_user) && !empty($current_user->display_name) ? $current_user->display_name : 'ARCHIVIST ZEROTSU')); ?> // VERIFIED CANON: <?php echo (int)$canon_count; ?> OF <?php echo (int)$total_entries; ?></span>
         </div>
 
       </div>
@@ -601,8 +601,10 @@
             </div>
 
             <!-- Card Footer Read Link -->
-            <div class="px-4 py-2.5 bg-paper-base border-t border-paper-line flex items-center justify-between font-mono text-[10px]">
-              <span class="text-ash">FOLIO // CAN-<?php echo sprintf('%03d', (int)$rec->id); ?></span>
+            <div class="px-4 py-2 bg-paper-base border-t border-paper-line flex items-center justify-between font-mono text-[10px]">
+              <span class="text-ash">
+                SCRIBE: <strong class="text-parchment"><?php echo html_escape(!empty($rec->author_name) ? $rec->author_name : 'Archivist Zerotsu'); ?></strong>
+              </span>
               <a href="<?php echo base_url('entries/view/' . $rec->id); ?>" class="text-gold font-bold group-hover:translate-x-0.5 transition uppercase">
                 READ DOSSIER &rarr;
               </a>
