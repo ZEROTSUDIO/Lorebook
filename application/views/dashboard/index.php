@@ -245,7 +245,12 @@
         <span class="w-2 h-2 bg-copper rotate-45"></span>
         <span class="text-gold font-bold tracking-widest uppercase">SECTION II // COMPENDIUM OF THE REALM — <?php echo strtoupper(html_escape($world_name)); ?></span>
       </div>
-      <span class="text-ash text-[11px]">HISTORICAL &amp; GEOGRAPHIC SURVEY</span>
+      <div class="flex items-center gap-3">
+        <a href="<?php echo base_url('dashboard/settings'); ?>" class="text-[10px] text-copper hover:text-gold border border-copper/50 hover:border-gold px-2 py-0.5 transition uppercase tracking-wider">
+          ⚙ EDIT COMPENDIUM
+        </a>
+        <span class="text-ash text-[11px] hidden sm:inline">HISTORICAL &amp; GEOGRAPHIC SURVEY</span>
+      </div>
     </div>
 
     <!-- Open Two-Page Manuscript Spread -->
@@ -256,7 +261,7 @@
         
         <div class="border-b border-paper-line pb-4">
           <div class="font-mono text-[11px] uppercase tracking-widest text-copper mb-1">
-            I. ANNALS OF THE SHATTERED NORTH
+            <?php echo html_escape(isset($world_settings['compendium_annals_label']) && $world_settings['compendium_annals_label'] !== '' ? $world_settings['compendium_annals_label'] : 'I. ANNALS OF THE REALM'); ?>
           </div>
           <h2 class="font-display font-bold text-3xl sm:text-4xl uppercase tracking-wide text-gold">
             History &amp; Foundations of <?php echo html_escape($world_name); ?>
@@ -265,37 +270,62 @@
 
         <!-- Illuminated Drop-Cap Prose -->
         <div class="font-prose text-base sm:text-[17px] leading-relaxed text-parchment space-y-4">
+          <?php 
+            $p1 = isset($world_settings['compendium_history_p1']) && $world_settings['compendium_history_p1'] !== '' 
+              ? $world_settings['compendium_history_p1'] 
+              : "Long before the southern synods raised their marble courts, the northern reaches of " . html_escape($world_name) . " were bound by the ancient covenants of the First Age of Stone.";
+            $p2 = isset($world_settings['compendium_history_p2']) && $world_settings['compendium_history_p2'] !== '' 
+              ? $world_settings['compendium_history_p2'] 
+              : "Survival across the frontier rests upon the sacred wardens and lamplighters who tend the eternal braziers between the isolated clan keeps.";
+          ?>
           <p class="first-letter:float-left first-letter:font-display first-letter:text-5xl first-letter:font-bold first-letter:text-gold first-letter:mr-3.5 first-letter:leading-none first-letter:border-2 first-letter:border-gold first-letter:px-3 first-letter:py-1 first-letter:bg-paper-base first-letter:shadow-ink-sm">
-            Long before the southern synods raised their marble courts in the valley of Valoria, the northern reaches of <?php echo html_escape($world_name); ?> were bound by the treaties of the First Age of Stone. Carved into sheer basalt cliffs above the Iron Pass, the great citadels were engineered to endure the White Gale—an unnatural winter that descends from the Frost-Veil every generation.
+            <?php echo nl2br(html_escape($p1)); ?>
           </p>
-          <p class="text-parchment-dim">
-            When the sun retreats during the high solstice cycles, ordinary timber and pitch fail against the creeping rime. Survival across the frontier rests upon the <strong class="text-gold font-normal">Covenant of the Pale Flame</strong>: a lineage of sworn Lamplighters and Border Wardens who tend the meteoric bronze censers between the isolated clan keeps.
-          </p>
+          <?php if (!empty($p2)): ?>
+            <p class="text-parchment-dim">
+              <?php echo nl2br(html_escape($p2)); ?>
+            </p>
+          <?php endif; ?>
         </div>
 
         <!-- Three Lore Pillars Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          <!-- Pillar I -->
           <div class="bg-paper-base border-2 border-paper-line p-4 shadow-ink-sm">
-            <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-1">PILLAR I // MYTHOS</div>
-            <h3 class="font-display font-bold text-xl text-gold uppercase mb-1.5">The Pale Flame</h3>
+            <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-1">
+              <?php echo html_escape(isset($world_settings['pillar_1_label']) && $world_settings['pillar_1_label'] !== '' ? $world_settings['pillar_1_label'] : 'PILLAR I // MYTHOS'); ?>
+            </div>
+            <h3 class="font-display font-bold text-xl text-gold uppercase mb-1.5">
+              <?php echo html_escape(isset($world_settings['pillar_1_title']) && $world_settings['pillar_1_title'] !== '' ? $world_settings['pillar_1_title'] : 'The Pale Flame'); ?>
+            </h3>
             <p class="font-prose text-xs text-parchment-dim leading-relaxed">
-              An unflickering amber fire drawn from deep subterranean veins. Only vessels forged in the First Age can carry its warmth across the frozen passes.
+              <?php echo html_escape(isset($world_settings['pillar_1_body']) && $world_settings['pillar_1_body'] !== '' ? $world_settings['pillar_1_body'] : 'An unflickering amber fire drawn from deep subterranean veins.'); ?>
             </p>
           </div>
 
+          <!-- Pillar II -->
           <div class="bg-paper-base border-2 border-paper-line p-4 shadow-ink-sm">
-            <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-1">PILLAR II // GEOGRAPHY</div>
-            <h3 class="font-display font-bold text-xl text-gold uppercase mb-1.5">The Iron Pass</h3>
+            <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-1">
+              <?php echo html_escape(isset($world_settings['pillar_2_label']) && $world_settings['pillar_2_label'] !== '' ? $world_settings['pillar_2_label'] : 'PILLAR II // GEOGRAPHY'); ?>
+            </div>
+            <h3 class="font-display font-bold text-xl text-gold uppercase mb-1.5">
+              <?php echo html_escape(isset($world_settings['pillar_2_title']) && $world_settings['pillar_2_title'] !== '' ? $world_settings['pillar_2_title'] : 'The Iron Pass'); ?>
+            </h3>
             <p class="font-prose text-xs text-parchment-dim leading-relaxed">
-              The narrow mountain artery linking the Northern Highlands and the Frost Keep to the fertile southern lowlands of Valoria.
+              <?php echo html_escape(isset($world_settings['pillar_2_body']) && $world_settings['pillar_2_body'] !== '' ? $world_settings['pillar_2_body'] : 'The narrow mountain artery linking the Highlands to the lowlands.'); ?>
             </p>
           </div>
 
+          <!-- Pillar III -->
           <div class="bg-paper-base border-2 border-paper-line p-4 shadow-ink-sm">
-            <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-1">PILLAR III // POLITICS</div>
-            <h3 class="font-display font-bold text-xl text-gold uppercase mb-1.5">The Synod Split</h3>
+            <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-1">
+              <?php echo html_escape(isset($world_settings['pillar_3_label']) && $world_settings['pillar_3_label'] !== '' ? $world_settings['pillar_3_label'] : 'PILLAR III // POLITICS'); ?>
+            </div>
+            <h3 class="font-display font-bold text-xl text-gold uppercase mb-1.5">
+              <?php echo html_escape(isset($world_settings['pillar_3_title']) && $world_settings['pillar_3_title'] !== '' ? $world_settings['pillar_3_title'] : 'The Synod Split'); ?>
+            </h3>
             <p class="font-prose text-xs text-parchment-dim leading-relaxed">
-              While the northern clans revere the Lamplighters, the southern Order of the Silver Hand seeks to catalog and seal all ancient pyromancy relics.
+              <?php echo html_escape(isset($world_settings['pillar_3_body']) && $world_settings['pillar_3_body'] !== '' ? $world_settings['pillar_3_body'] : 'The ideological divide between clan wardens and inquisitorial orders.'); ?>
             </p>
           </div>
         </div>
@@ -304,11 +334,15 @@
         <div class="bg-paper-deep border border-paper-line p-4 font-mono text-xs grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
             <span class="block text-[10px] text-ash uppercase">Dominant Seat</span>
-            <span class="text-parchment font-bold">The Frost Keep</span>
+            <span class="text-parchment font-bold">
+              <?php echo html_escape(isset($world_settings['dominant_seat']) && $world_settings['dominant_seat'] !== '' ? $world_settings['dominant_seat'] : 'High Keep'); ?>
+            </span>
           </div>
           <div>
             <span class="block text-[10px] text-ash uppercase">Calendar System</span>
-            <span class="text-gold font-bold">BV / AV / 2A</span>
+            <span class="text-gold font-bold">
+              <?php echo html_escape(isset($world_settings['calendar_system']) && $world_settings['calendar_system'] !== '' ? $world_settings['calendar_system'] : 'Standard Era'); ?>
+            </span>
           </div>
           <div>
             <span class="block text-[10px] text-ash uppercase">Current Cycle</span>
@@ -316,7 +350,9 @@
           </div>
           <div>
             <span class="block text-[10px] text-ash uppercase">Realm Status</span>
-            <span class="text-copper font-bold">SOLSTICE ALERT</span>
+            <span class="text-copper font-bold">
+              <?php echo html_escape(isset($world_settings['realm_status']) && $world_settings['realm_status'] !== '' ? $world_settings['realm_status'] : 'CANONICAL'); ?>
+            </span>
           </div>
         </div>
 
@@ -328,7 +364,9 @@
         <!-- PLATE II: CARTOGRAPHIC MAP PLACEHOLDER -->
         <div class="bg-paper-base border-2 border-paper-line p-3 shadow-ink corner-brackets">
           <div class="flex items-center justify-between font-mono text-[10px] text-ash pb-2 border-b border-paper-line mb-2">
-            <span class="text-gold font-bold">PLATE II // CARTOGRAPHIC SURVEY</span>
+            <span class="text-gold font-bold">
+              <?php echo html_escape(isset($world_settings['map_plate_label']) && $world_settings['map_plate_label'] !== '' ? $world_settings['map_plate_label'] : 'PLATE II // CARTOGRAPHIC SURVEY'); ?>
+            </span>
             <span>SCALE 1:2,400,000</span>
           </div>
 
@@ -352,19 +390,19 @@
             </svg>
 
             <div class="relative z-10 flex justify-between text-[10px] font-mono text-gold/80">
-              <span>[MAP PLACEHOLDER]</span>
-              <span>NORTHERN REACHES</span>
+              <span>[MAP SURVEY]</span>
+              <span><?php echo strtoupper(html_escape($world_name)); ?></span>
             </div>
 
-            <!-- Simulated Map Labels -->
+            <!-- Dynamic Map Labels -->
             <div class="relative z-10 my-auto flex flex-col gap-1.5 pl-4 font-mono text-[10px]">
-              <span class="text-gold">◈ THE FROST KEEP (High Crags)</span>
-              <span class="text-copper pl-6">◈ THE IRON PASS (Ward Gate)</span>
-              <span class="text-parchment-dim pl-12">◈ VALLEY OF VALORIA</span>
+              <span class="text-gold">◈ <?php echo html_escape(isset($world_settings['map_node_1']) && $world_settings['map_node_1'] !== '' ? $world_settings['map_node_1'] : 'PRIMARY CITADEL'); ?></span>
+              <span class="text-copper pl-6">◈ <?php echo html_escape(isset($world_settings['map_node_2']) && $world_settings['map_node_2'] !== '' ? $world_settings['map_node_2'] : 'BORDER PASS / GATEWAY'); ?></span>
+              <span class="text-parchment-dim pl-12">◈ <?php echo html_escape(isset($world_settings['map_node_3']) && $world_settings['map_node_3'] !== '' ? $world_settings['map_node_3'] : 'OUTER SETTLEMENTS'); ?></span>
             </div>
 
             <div class="relative z-10 font-mono text-[10px] text-ash flex justify-between">
-              <span>FILE: MAP_OF_CANAAN_NORTH.WEBP</span>
+              <span>FILE: <?php echo html_escape(isset($world_settings['map_plate_file']) && $world_settings['map_plate_file'] !== '' ? $world_settings['map_plate_file'] : 'MAP_' . strtoupper($world_name) . '.WEBP'); ?></span>
               <a href="<?php echo base_url('entries?type=realms'); ?>" class="text-gold hover:underline">GAZETTEER &rarr;</a>
             </div>
           </div>
@@ -373,7 +411,9 @@
         <!-- PLATE III: HISTORICAL WOODCUT / ARCHITECTURE PLACEHOLDER -->
         <div class="bg-paper-base border-2 border-paper-line p-3 shadow-ink corner-brackets">
           <div class="flex items-center justify-between font-mono text-[10px] text-ash pb-2 border-b border-paper-line mb-2">
-            <span class="text-copper font-bold">PLATE III // ARCHITECTURAL ETCHING</span>
+            <span class="text-copper font-bold">
+              <?php echo html_escape(isset($world_settings['arch_etching_title']) && $world_settings['arch_etching_title'] !== '' ? $world_settings['arch_etching_title'] : 'PLATE III // ARCHITECTURAL ETCHING'); ?>
+            </span>
             <span>FIG. 04</span>
           </div>
 
@@ -385,9 +425,9 @@
               <line x1="5" y1="90" x2="95" y2="90"/>
               <circle cx="50" cy="28" r="5"/>
             </svg>
-            <span class="font-display italic text-base text-parchment-dim">[Woodcut Engraving Placeholder]</span>
+            <span class="font-display italic text-base text-parchment-dim">[Woodcut Engraving]</span>
             <span class="font-mono text-[10px] text-ash uppercase tracking-widest mt-0.5">
-              THE GREAT BRAZIER OF THE FROST KEEP (ETCHING_014.WEBP)
+              <?php echo html_escape(isset($world_settings['arch_etching_caption']) && $world_settings['arch_etching_caption'] !== '' ? $world_settings['arch_etching_caption'] : 'ENGRAVING OF ' . strtoupper($world_name)); ?>
             </span>
           </div>
         </div>

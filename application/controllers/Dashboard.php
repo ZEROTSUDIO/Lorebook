@@ -131,7 +131,16 @@ class Dashboard extends CI_Controller {
             $this->db->group_by('tags.id');
             $this->db->order_by('usage_count', 'DESC');
             $world_tags = $this->db->get()->result();
+
+            // Fetch World Compendium Settings from app_settings
+            $world_settings = $this->get_world_settings($wid);
+        } else {
+            $world_settings = array();
         }
+
+        $current_cycle = isset($world_settings['current_cycle']) && $world_settings['current_cycle'] !== '' 
+            ? $world_settings['current_cycle'] 
+            : '842 2A';
 
         // 3. Prepare data for layout and view
         $data = array(
@@ -139,7 +148,8 @@ class Dashboard extends CI_Controller {
             'hide_header_banner' => TRUE,
             'active_tab'         => 'dashboard',
             'active_world'       => $active_world,
-            'current_cycle'      => '842 2A',
+            'current_cycle'      => $current_cycle,
+            'world_settings'     => $world_settings,
             'total_entries'      => $total_entries,
             'canon_count'        => $canon_count,
             'draft_count'        => $draft_count,
@@ -154,6 +164,106 @@ class Dashboard extends CI_Controller {
 
         // 4. Load master layout
         $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * World Compendium & Atlas Settings Editor
+     */
+    public function settings()
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $active_world = $this->db->get_where('worlds', array('id' => $world_id))->row();
+
+        if (!$active_world) {
+            $active_world = $this->db->get('worlds')->row();
+            if ($active_world) {
+                $this->session->set_userdata('active_world_id', $active_world->id);
+                $world_id = $active_world->id;
+            }
+        }
+
+        if (!$active_world) {
+            show_error('No world found to configure.');
+            return;
+        }
+
+        if ($this->input->method() === 'post') {
+            $keys = array(
+                'compendium_annals_label',
+                'compendium_history_p1',
+                'compendium_history_p2',
+                'pillar_1_label',
+                'pillar_1_title',
+                'pillar_1_body',
+                'pillar_2_label',
+                'pillar_2_title',
+                'pillar_2_body',
+                'pillar_3_label',
+                'pillar_3_title',
+                'pillar_3_body',
+                'dominant_seat',
+                'calendar_system',
+                'current_cycle',
+                'realm_status',
+                'map_plate_label',
+                'map_plate_file',
+                'map_node_1',
+                'map_node_2',
+                'map_node_3',
+                'arch_etching_title',
+                'arch_etching_caption',
+            );
+
+            foreach ($keys as $k) {
+                $val = $this->input->post($k, FALSE);
+                $this->save_setting($world_id, $k, $val !== NULL ? trim($val) : '');
+            }
+
+            $this->session->set_flashdata('success', 'World Compendium & Chronicles updated successfully.');
+            redirect('dashboard/settings');
+            return;
+        }
+
+        $world_settings = $this->get_world_settings($world_id);
+
+        $data = array(
+            'page_title'         => 'Compendium Settings // ' . $active_world->name,
+            'hide_header_banner' => TRUE,
+            'active_tab'         => 'dashboard',
+            'active_world'       => $active_world,
+            'world_settings'     => $world_settings,
+            'content_view'       => 'dashboard/settings',
+        );
+
+        $this->load->view('layouts/main', $data);
+    }
+
+    private function get_world_settings($world_id)
+    {
+        $rows = $this->db->get_where('app_settings', array('world_id' => $world_id))->result();
+        $settings = array();
+        foreach ($rows as $r) {
+            $settings[$r->setting_key] = $r->setting_value;
+        }
+        return $settings;
+    }
+
+    private function save_setting($world_id, $key, $value)
+    {
+        $existing = $this->db->get_where('app_settings', array('world_id' => $world_id, 'setting_key' => $key))->row();
+        if ($existing) {
+            $this->db->where('id', $existing->id)->update('app_settings', array(
+                'setting_value' => $value,
+                'updated_at'    => date('Y-m-d H:i:s'),
+            ));
+        } else {
+            $this->db->insert('app_settings', array(
+                'world_id'      => $world_id,
+                'setting_key'   => $key,
+                'setting_value' => $value,
+                'updated_at'    => date('Y-m-d H:i:s'),
+            ));
+        }
     }
 
     /**
@@ -347,6 +457,44 @@ class Dashboard extends CI_Controller {
 
             foreach ($starter_events as $ev) {
                 $this->db->insert('timeline_events', $ev);
+            }
+        }
+
+        // Ensure starter Compendium Settings exist for the world
+        if ($this->db->where('world_id', $world->id)->count_all_results('app_settings') === 0) {
+            $compendium_defaults = array(
+                'compendium_annals_label' => 'I. ANNALS OF THE SHATTERED NORTH',
+                'compendium_history_p1'   => 'Long before the southern synods raised their marble courts in the valley of Valoria, the northern reaches of Canaan were bound by the treaties of the First Age of Stone. Carved into sheer basalt cliffs above the Iron Pass, the great citadels were engineered to endure the White Gale—an unnatural winter that descends from the Frost-Veil every generation.',
+                'compendium_history_p2'   => 'When the sun retreats during the high solstice cycles, ordinary timber and pitch fail against the creeping rime. Survival across the frontier rests upon the Covenant of the Pale Flame: a lineage of sworn Lamplighters and Border Wardens who tend the meteoric bronze censers between the isolated clan keeps.',
+                'pillar_1_label'          => 'PILLAR I // MYTHOS',
+                'pillar_1_title'          => 'The Pale Flame',
+                'pillar_1_body'           => 'An unflickering amber fire drawn from deep subterranean veins. Only vessels forged in the First Age can carry its warmth across the frozen passes.',
+                'pillar_2_label'          => 'PILLAR II // GEOGRAPHY',
+                'pillar_2_title'          => 'The Iron Pass',
+                'pillar_2_body'           => 'The narrow mountain artery linking the Northern Highlands and the Frost Keep to the fertile southern lowlands of Valoria.',
+                'pillar_3_label'          => 'PILLAR III // POLITICS',
+                'pillar_3_title'          => 'The Synod Split',
+                'pillar_3_body'           => 'While the northern clans revere the Lamplighters, the southern Order of the Silver Hand seeks to catalog and seal all ancient pyromancy relics.',
+                'dominant_seat'           => 'The Frost Keep',
+                'calendar_system'         => 'BV / AV / 2A',
+                'current_cycle'           => '842 2A',
+                'realm_status'            => 'SOLSTICE ALERT',
+                'map_plate_label'         => 'PLATE II // CARTOGRAPHIC SURVEY',
+                'map_plate_file'          => 'MAP_OF_CANAAN_NORTH.WEBP',
+                'map_node_1'              => 'THE FROST KEEP (High Crags)',
+                'map_node_2'              => 'THE IRON PASS (Ward Gate)',
+                'map_node_3'              => 'VALLEY OF VALORIA',
+                'arch_etching_title'      => 'PLATE III // ARCHITECTURAL ETCHING',
+                'arch_etching_caption'    => 'THE GREAT BRAZIER OF THE FROST KEEP (ETCHING_014.WEBP)',
+            );
+
+            foreach ($compendium_defaults as $key => $val) {
+                $this->db->insert('app_settings', array(
+                    'world_id'      => $world->id,
+                    'setting_key'   => $key,
+                    'setting_value' => $val,
+                    'updated_at'    => date('Y-m-d H:i:s'),
+                ));
             }
         }
     }
