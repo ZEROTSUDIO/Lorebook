@@ -5,7 +5,33 @@
       <span class="w-2 h-2 bg-gold rotate-45 inline-block"></span>
       <span class="font-bold tracking-wider uppercase"><?php echo html_escape($this->session->flashdata('success_msg')); ?></span>
     </div>
-    <span class="text-ash text-[10px] uppercase">CODEX ARCHIVED</span>
+    <span class="text-ash text-[10px] uppercase">CODEX UPDATED</span>
+  </div>
+<?php endif; ?>
+
+<?php if ($this->session->flashdata('error_msg')): ?>
+  <div class="mb-6 p-4 border-2 border-crimson bg-crimson-dark/40 font-mono text-xs text-parchment shadow-ink-sm flex items-start gap-3">
+    <span class="text-crimson font-bold text-base">⚠️</span>
+    <div>
+      <div class="font-bold uppercase tracking-wider text-crimson-seal mb-1">OPERATION ERROR</div>
+      <div class="leading-relaxed"><?php echo html_escape($this->session->flashdata('error_msg')); ?></div>
+    </div>
+  </div>
+<?php endif; ?>
+
+<!-- ARCHIVED WARNING BANNER -->
+<?php if (!empty($entry->is_archived)): ?>
+  <div class="mb-6 p-4 border-2 border-copper bg-paper-panel font-mono text-xs text-copper shadow-ink flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <span class="text-base">⚠️</span>
+      <div>
+        <span class="font-bold tracking-wider uppercase">THIS RECORD IS CURRENTLY ARCHIVED / SEALED</span>
+        <div class="text-ash text-[11px] mt-0.5">Sealed on <?php echo html_escape($entry->deleted_at); ?>. It is hidden from the active codex.</div>
+      </div>
+    </div>
+    <a href="<?php echo base_url('entries/restore/' . $entry->id); ?>" class="px-4 py-1.5 border border-gold bg-gold hover:bg-gold-light text-paper-ink font-bold tracking-widest uppercase transition">
+      ✦ UNSEAL &amp; RESTORE RECORD
+    </a>
   </div>
 <?php endif; ?>
 
@@ -73,9 +99,17 @@
             <span class="font-mono font-bold text-xs uppercase tracking-widest text-copper border-2 border-copper px-3 py-0.5 rotate-2 shadow-ink-sm bg-paper-base">
               DRAFT RECORD
             </span>
+          <?php elseif ($entry->status === 'apocrypha'): ?>
+            <span class="font-mono font-bold text-xs uppercase tracking-widest text-purple-300 border-2 border-purple-400 px-3 py-0.5 shadow-ink-sm bg-paper-base">
+              APOCRYPHA
+            </span>
+          <?php elseif ($entry->status === 'retconned'): ?>
+            <span class="font-mono font-bold text-xs uppercase tracking-widest text-ash border-2 border-ash px-3 py-0.5 shadow-ink-sm bg-paper-base">
+              RETCONNED
+            </span>
           <?php else: ?>
             <span class="font-mono font-bold text-xs uppercase tracking-widest text-ash border-2 border-ash px-3 py-0.5 shadow-ink-sm bg-paper-base">
-              ARCHIVED
+              RECORD
             </span>
           <?php endif; ?>
 
@@ -97,13 +131,31 @@
         <?php endif; ?>
 
         <!-- CONTROLS -->
-        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-paper-line">
-          <a href="<?php echo base_url('entries/create'); ?>" class="border-2 border-paper-line hover:border-gold py-2 text-center font-mono text-xs uppercase tracking-wider text-parchment bg-paper-base transition">
-            [＋ NEW ENTRY]
-          </a>
-          <a href="<?php echo base_url('dashboard'); ?>" class="border-2 border-gold py-2 text-center font-mono text-xs uppercase tracking-wider text-paper-ink font-bold bg-gold hover:bg-gold-light transition shadow-ink-sm">
-            [CODEX INDEX]
-          </a>
+        <div class="flex flex-col gap-2 pt-2 border-t border-paper-line">
+          <div class="grid grid-cols-2 gap-2">
+            <a href="<?php echo base_url('entries/edit/' . $entry->id); ?>" class="border-2 border-gold py-2 text-center font-mono text-xs uppercase tracking-wider text-paper-ink font-bold bg-gold hover:bg-gold-light transition shadow-ink-sm">
+              [EDIT RECORD]
+            </a>
+            <a href="<?php echo base_url('entries/create'); ?>" class="border-2 border-paper-line hover:border-gold py-2 text-center font-mono text-xs uppercase tracking-wider text-parchment bg-paper-base transition">
+              [＋ NEW ENTRY]
+            </a>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <?php if (empty($entry->is_archived)): ?>
+              <a href="<?php echo base_url('entries/archive/' . $entry->id); ?>" onclick="return confirm('Seal this record into the archives?');" class="border border-crimson/70 hover:border-crimson py-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-crimson hover:bg-crimson/10 transition">
+                [SEAL / ARCHIVE]
+              </a>
+            <?php else: ?>
+              <a href="<?php echo base_url('entries/restore/' . $entry->id); ?>" class="border border-gold hover:border-gold py-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-gold hover:bg-gold/10 transition">
+                [UNSEAL RECORD]
+              </a>
+            <?php endif; ?>
+            
+            <a href="<?php echo base_url('entries'); ?>" class="border border-paper-line hover:border-parchment-dark py-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-ash hover:text-parchment transition">
+              [ALL RECORDS]
+            </a>
+          </div>
         </div>
 
       </div>

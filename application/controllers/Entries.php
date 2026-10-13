@@ -40,7 +40,12 @@ class Entries extends CI_Controller {
         }
 
         if (!empty($status)) {
-            $this->db->where('entries.status', $status);
+            if ($status === 'archived') {
+                $this->db->where('entries.is_archived', 1);
+            } else {
+                $this->db->where('entries.status', $status);
+                $this->db->where('entries.is_archived', 0);
+            }
         } else {
             // Default view hides archived entries unless filtered
             $this->db->where('entries.is_archived', 0);
@@ -298,6 +303,238 @@ class Entries extends CI_Controller {
         );
 
         $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * Edit Entry Form
+     */
+    public function edit($id)
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $entry = $this->db->select('entries.*, entry_types.name as type_name, entry_types.slug as type_slug')
+                          ->from('entries')
+                          ->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left')
+                          ->where('entries.id', $id)
+                          ->where('entries.world_id', $world_id)
+                          ->get()->row();
+
+        if (!$entry) {
+            show_404();
+        }
+
+        $active_world = $this->db->get_where('worlds', array('id' => $world_id))->row();
+        $entry_types = $this->db->order_by('sort_order', 'ASC')->get_where('entry_types', array('world_id' => $world_id))->result();
+        $this->ensure_default_properties($entry_types);
+
+        // Fetch property definitions by type
+        $properties_by_type = array();
+        foreach ($entry_types as $type) {
+            $props = $this->db->order_by('sort_order', 'ASC')->get_where('property_definitions', array('entry_type_id' => $type->id))->result();
+            $properties_by_type[$type->id] = $props;
+        }
+
+        // Fetch existing property values for this entry keyed by definition id
+        $raw_values = $this->db->get_where('property_values', array('entry_id' => $id))->result();
+        $saved_properties = array();
+        foreach ($raw_values as $pv) {
+            $saved_properties[$pv->property_definition_id] = $pv->value_text;
+        }
+
+        // Fetch existing tags formatted as comma-separated string
+        $raw_tags = $this->db->select('t.name')
+                             ->from('entry_tags et')
+                             ->join('tags t', 't.id = et.tag_id')
+                             ->where('et.entry_id', $id)
+                             ->get()->result();
+        $tag_names = array();
+        foreach ($raw_tags as $rt) {
+            $tag_names[] = $rt->name;
+        }
+        $saved_tags = implode(', ', $tag_names);
+
+        $data = array(
+            'page_title'         => 'Edit ' . $entry->title,
+            'header_title'       => 'Edit Codex Record',
+            'sub_heading'        => 'CODEX SCRIBE // AMEND DOSSIER',
+            'header_caption'     => 'Revising recorded history for Public ID: ' . $entry->public_id,
+            'active_tab'         => $entry->type_slug,
+            'active_world'       => $active_world,
+            'entry'              => $entry,
+            'entry_types'        => $entry_types,
+            'properties_by_type' => $properties_by_type,
+            'saved_properties'   => $saved_properties,
+            'saved_tags'         => $saved_tags,
+            'content_view'       => 'entries/edit',
+        );
+
+        $this->load->view('layouts/main', $data);
+    }
+
+    /**
+     * Update existing lore entry in MySQL
+     */
+    public function update($id)
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $user_id  = $this->session->userdata('user_id') ?: 1;
+
+        $entry = $this->db->get_where('entries', array('id' => $id, 'world_id' => $world_id))->row();
+        if (!$entry) {
+            show_404();
+        }
+
+        // Validation Rules
+        $this->form_validation->set_rules('title', 'Title', 'trim|required|min_length[2]|max_length[200]');
+        $this->form_validation->set_rules('entry_type_id', 'Entry Type', 'required|numeric');
+        $this->form_validation->set_rules('status', 'Status', 'trim|required|in_list[canon,draft,apocrypha,retconned]');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->edit($id);
+            return;
+        }
+
+        $title = $this->input->post('title', TRUE);
+        $raw_slug = $this->input->post('slug', TRUE);
+        $base_slug = !empty($raw_slug) ? url_title($raw_slug, '-', TRUE) : url_title($title, '-', TRUE);
+
+        // Ensure slug is unique per world (excluding current entry id)
+        $slug = $this->make_unique_slug_for_update($world_id, $base_slug, $id);
+
+        $entry_type_id = (int)$this->input->post('entry_type_id');
+        $status = $this->input->post('status', TRUE);
+        $cover_image = $this->input->post('cover_image', TRUE);
+        $summary = $this->input->post('summary', TRUE);
+        $content_markdown = $this->input->post('content_markdown');
+
+        // Start Transaction
+        $this->db->trans_start();
+
+        $update_data = array(
+            'entry_type_id'    => $entry_type_id,
+            'title'            => $title,
+            'slug'             => $slug,
+            'summary'          => $summary,
+            'content_markdown' => $content_markdown,
+            'status'           => $status,
+            'cover_image'      => !empty($cover_image) ? $cover_image : NULL,
+            'updated_by'       => $user_id,
+            'updated_at'       => date('Y-m-d H:i:s'),
+        );
+
+        $this->db->where('id', $id)->update('entries', $update_data);
+
+        // Sync Custom Properties
+        $properties = $this->input->post('properties');
+        $this->db->where('entry_id', $id)->delete('property_values');
+
+        if (is_array($properties)) {
+            foreach ($properties as $prop_def_id => $val) {
+                if ($val !== '' && $val !== null) {
+                    $this->db->insert('property_values', array(
+                        'entry_id'               => $id,
+                        'property_definition_id' => (int)$prop_def_id,
+                        'value_text'             => is_string($val) ? $val : json_encode($val),
+                        'created_at'             => date('Y-m-d H:i:s'),
+                        'updated_at'             => date('Y-m-d H:i:s'),
+                    ));
+                }
+            }
+        }
+
+        // Sync Tags
+        $this->db->where('entry_id', $id)->delete('entry_tags');
+        $tags_input = $this->input->post('tags', TRUE);
+        if (!empty($tags_input)) {
+            $tag_names = array_map('trim', explode(',', $tags_input));
+            foreach ($tag_names as $tag_name) {
+                if (empty($tag_name)) continue;
+                $tag_slug = url_title($tag_name, '-', TRUE);
+
+                $tag = $this->db->get_where('tags', array('world_id' => $world_id, 'slug' => $tag_slug))->row();
+                if (!$tag) {
+                    $this->db->insert('tags', array(
+                        'world_id'   => $world_id,
+                        'name'       => $tag_name,
+                        'slug'       => $tag_slug,
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ));
+                    $tag_id = $this->db->insert_id();
+                } else {
+                    $tag_id = $tag->id;
+                }
+
+                $this->db->insert('entry_tags', array(
+                    'entry_id' => $id,
+                    'tag_id'   => $tag_id,
+                ));
+            }
+        }
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->session->set_flashdata('error_msg', 'Failed to update record due to a database error.');
+            redirect('entries/edit/' . $id);
+        } else {
+            $this->session->set_flashdata('success_msg', 'Record "' . $title . '" updated successfully in the Codex!');
+            redirect('entries/view/' . $id);
+        }
+    }
+
+    /**
+     * Reversible Soft-Archive an Entry
+     */
+    public function archive($id)
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $entry = $this->db->get_where('entries', array('id' => $id, 'world_id' => $world_id))->row();
+
+        if (!$entry) {
+            show_404();
+        }
+
+        $this->db->where('id', $id)->update('entries', array(
+            'is_archived' => 1,
+            'deleted_at'  => date('Y-m-d H:i:s'),
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ));
+
+        $this->session->set_flashdata('success_msg', 'Record "' . $entry->title . '" has been sealed in the archives.');
+        redirect('entries');
+    }
+
+    /**
+     * Restore an Archived Entry
+     */
+    public function restore($id)
+    {
+        $world_id = $this->session->userdata('active_world_id');
+        $entry = $this->db->get_where('entries', array('id' => $id, 'world_id' => $world_id))->row();
+
+        if (!$entry) {
+            show_404();
+        }
+
+        $this->db->where('id', $id)->update('entries', array(
+            'is_archived' => 0,
+            'deleted_at'  => NULL,
+            'updated_at'  => date('Y-m-d H:i:s'),
+        ));
+
+        $this->session->set_flashdata('success_msg', 'Record "' . $entry->title . '" has been unsealed and restored to the active codex.');
+        redirect('entries/view/' . $id);
+    }
+
+    private function make_unique_slug_for_update($world_id, $base_slug, $exclude_id)
+    {
+        $slug = $base_slug;
+        $counter = 1;
+        while ($this->db->where(array('world_id' => $world_id, 'slug' => $slug, 'id !=' => $exclude_id))->count_all_results('entries') > 0) {
+            $slug = $base_slug . '-' . $counter;
+            $counter++;
+        }
+        return $slug;
     }
 
     private function ensure_session_world()

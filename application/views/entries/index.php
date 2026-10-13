@@ -1,6 +1,27 @@
 <!-- ENCYCLOPEDIA BROWSER & FILTER MATRIX -->
 <div class="flex flex-col gap-8">
 
+  <!-- FLASH MESSAGE NOTIFICATION -->
+  <?php if ($this->session->flashdata('success_msg')): ?>
+    <div class="p-4 border-2 border-gold bg-paper-panel font-mono text-xs text-gold shadow-ink flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 bg-gold rotate-45 inline-block"></span>
+        <span class="font-bold tracking-wider uppercase"><?php echo html_escape($this->session->flashdata('success_msg')); ?></span>
+      </div>
+      <span class="text-ash text-[10px] uppercase">CODEX ARCHIVE</span>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($this->session->flashdata('error_msg')): ?>
+    <div class="p-4 border-2 border-crimson bg-crimson-dark/40 font-mono text-xs text-parchment shadow-ink-sm flex items-start gap-3">
+      <span class="text-crimson font-bold text-base">⚠️</span>
+      <div>
+        <div class="font-bold uppercase tracking-wider text-crimson-seal mb-1">OPERATION ERROR</div>
+        <div class="leading-relaxed"><?php echo html_escape($this->session->flashdata('error_msg')); ?></div>
+      </div>
+    </div>
+  <?php endif; ?>
+
   <!-- 1. SEARCH & FILTER CONTROL PANEL -->
   <section class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
     
