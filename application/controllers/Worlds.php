@@ -80,13 +80,17 @@ class Worlds extends CI_Controller {
                     'created_at' => date('Y-m-d H:i:s'),
                 ));
 
-                // Provision the standard 5 Book Tome Entry Types for the new realm
+                // Provision the 9 Archetype Entry Types for the new realm
                 $default_types = array(
-                    array('name' => 'Persons & Clans', 'slug' => 'persons', 'icon' => 'user', 'sort_order' => 1),
-                    array('name' => 'Realms & Seats', 'slug' => 'realms', 'icon' => 'map-pin', 'sort_order' => 2),
-                    array('name' => 'Sacred Orders', 'slug' => 'orders', 'icon' => 'shield', 'sort_order' => 3),
-                    array('name' => 'Bestiary & Relics', 'slug' => 'bestiary', 'icon' => 'gem', 'sort_order' => 4),
-                    array('name' => 'Chronicle & Eras', 'slug' => 'chronicle', 'icon' => 'history', 'sort_order' => 5),
+                    array('name' => 'Personae & Bloodlines', 'slug' => 'characters', 'icon' => 'user', 'sort_order' => 1),
+                    array('name' => 'Realms & Sovereign Nations', 'slug' => 'nations', 'icon' => 'map-pin', 'sort_order' => 2),
+                    array('name' => 'Reliquary & Sacred Armaments', 'slug' => 'artifacts', 'icon' => 'gem', 'sort_order' => 3),
+                    array('name' => 'Annals of Great Epochs', 'slug' => 'events', 'icon' => 'history', 'sort_order' => 4),
+                    array('name' => 'Arcana, Doctrines & Lore', 'slug' => 'concepts', 'icon' => 'book-open', 'sort_order' => 5),
+                    array('name' => 'Synod of Guilds & Orders', 'slug' => 'orders', 'icon' => 'shield', 'sort_order' => 6),
+                    array('name' => 'Bestiary of Primal Beasts', 'slug' => 'species', 'icon' => 'feather', 'sort_order' => 7),
+                    array('name' => 'Landmarks, Sites & Ruins', 'slug' => 'locations', 'icon' => 'compass', 'sort_order' => 8),
+                    array('name' => 'Codex of Arcane Arts', 'slug' => 'magic', 'icon' => 'zap', 'sort_order' => 9),
                 );
 
                 foreach ($default_types as $t) {
@@ -170,23 +174,76 @@ class Worlds extends CI_Controller {
 
     private function seed_type_properties($type_id, $slug)
     {
-        if ($slug === 'persons') {
+        if ($slug === 'characters' || $slug === 'persons') {
             $defs = array(
-                array('field_key' => 'origin_seat', 'label' => 'Origin Seat', 'field_type' => 'text', 'sort_order' => 1),
-                array('field_key' => 'clan', 'label' => 'Cohort / Clan', 'field_type' => 'text', 'sort_order' => 2),
-                array('field_key' => 'aspect', 'label' => 'Arcane Aspect', 'field_type' => 'text', 'sort_order' => 3),
-                array('field_key' => 'primary_relic', 'label' => 'Primary Relic', 'field_type' => 'text', 'sort_order' => 4),
+                array('field_key' => 'species',     'label' => 'Species / Race',      'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'age',         'label' => 'Age / Lifespan',      'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'occupation',  'label' => 'Title / Occupation',  'field_type' => 'text', 'sort_order' => 3),
+                array('field_key' => 'origin_seat', 'label' => 'Origin Seat',         'field_type' => 'text', 'sort_order' => 4),
+                array('field_key' => 'clan',        'label' => 'Cohort / Clan',       'field_type' => 'text', 'sort_order' => 5),
+                array('field_key' => 'weapon',      'label' => 'Signature Weapon',    'field_type' => 'text', 'sort_order' => 6),
+                array('field_key' => 'aspect',      'label' => 'Arcane Aspect',       'field_type' => 'text', 'sort_order' => 7),
+                array('field_key' => 'abilities',   'label' => 'Abilities / Arts',    'field_type' => 'text', 'sort_order' => 8),
             );
-        } elseif ($slug === 'realms') {
+        } elseif ($slug === 'nations' || $slug === 'realms') {
             $defs = array(
-                array('field_key' => 'ruler', 'label' => 'Current Ruler', 'field_type' => 'text', 'sort_order' => 1),
-                array('field_key' => 'capital', 'label' => 'Seat of Power', 'field_type' => 'text', 'sort_order' => 2),
-                array('field_key' => 'climate', 'label' => 'Climate / Terrain', 'field_type' => 'text', 'sort_order' => 3),
+                array('field_key' => 'government', 'label' => 'Government Type',           'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'ruler',      'label' => 'Current Sovereign / Ruler', 'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'capital',    'label' => 'Seat of Power / Capital',   'field_type' => 'text', 'sort_order' => 3),
+                array('field_key' => 'population', 'label' => 'Approximate Population',     'field_type' => 'text', 'sort_order' => 4),
+                array('field_key' => 'military',   'label' => 'Dominant Military / Guard', 'field_type' => 'text', 'sort_order' => 5),
+                array('field_key' => 'climate',    'label' => 'Climate / Terrain',         'field_type' => 'text', 'sort_order' => 6),
+            );
+        } elseif ($slug === 'artifacts') {
+            $defs = array(
+                array('field_key' => 'item_class',     'label' => 'Relic Classification',       'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'origin_creator', 'label' => 'Origin / Forged By',         'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'materials',      'label' => 'Materials & Runes',          'field_type' => 'text', 'sort_order' => 3),
+                array('field_key' => 'wielder',        'label' => 'Current Wielder / Bearer',   'field_type' => 'text', 'sort_order' => 4),
+                array('field_key' => 'powers',         'label' => 'Potency / Arcane Properties','field_type' => 'text', 'sort_order' => 5),
+            );
+        } elseif ($slug === 'events' || $slug === 'chronicle') {
+            $defs = array(
+                array('field_key' => 'epoch',        'label' => 'Era / Epoch',            'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'event_date',   'label' => 'Recorded Date',          'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'participants', 'label' => 'Key Figures & Factions', 'field_type' => 'text', 'sort_order' => 3),
+                array('field_key' => 'outcome',      'label' => 'Treaty / Outcome',       'field_type' => 'text', 'sort_order' => 4),
+            );
+        } elseif ($slug === 'concepts') {
+            $defs = array(
+                array('field_key' => 'sphere',       'label' => 'Cosmic Sphere / Domain',   'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'doctrine',     'label' => 'Core Doctrine / Tenet',    'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'sacred_texts', 'label' => 'Sacred Texts / Treatises', 'field_type' => 'text', 'sort_order' => 3),
+            );
+        } elseif ($slug === 'orders') {
+            $defs = array(
+                array('field_key' => 'grandmaster', 'label' => 'Grandmaster / Leader', 'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'sanctum',     'label' => 'Primary Sanctum',      'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'doctrine',    'label' => 'Order Creed / Vow',    'field_type' => 'text', 'sort_order' => 3),
+            );
+        } elseif ($slug === 'species' || $slug === 'bestiary') {
+            $defs = array(
+                array('field_key' => 'classification', 'label' => 'Classification / Biology', 'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'habitat',        'label' => 'Primary Habitat',          'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'threat_level',   'label' => 'Threat / Disposition',     'field_type' => 'text', 'sort_order' => 3),
+            );
+        } elseif ($slug === 'locations') {
+            $defs = array(
+                array('field_key' => 'region',              'label' => 'Surrounding Region',  'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'terrain',             'label' => 'Terrain & Climate',   'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'controlling_faction', 'label' => 'Controlling Faction', 'field_type' => 'text', 'sort_order' => 3),
+                array('field_key' => 'danger_level',        'label' => 'Wards / Hazards',     'field_type' => 'text', 'sort_order' => 4),
+            );
+        } elseif ($slug === 'magic') {
+            $defs = array(
+                array('field_key' => 'source',        'label' => 'Source of Power',      'field_type' => 'text', 'sort_order' => 1),
+                array('field_key' => 'practitioners', 'label' => 'Covenant / Weavers',   'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'taboos',        'label' => 'Limitations & Taboos', 'field_type' => 'text', 'sort_order' => 3),
             );
         } else {
             $defs = array(
                 array('field_key' => 'origin', 'label' => 'Origin / Creator', 'field_type' => 'text', 'sort_order' => 1),
-                array('field_key' => 'powers', 'label' => 'Potency / Class', 'field_type' => 'text', 'sort_order' => 2),
+                array('field_key' => 'powers', 'label' => 'Potency / Class',   'field_type' => 'text', 'sort_order' => 2),
             );
         }
 

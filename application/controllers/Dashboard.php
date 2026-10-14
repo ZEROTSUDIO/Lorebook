@@ -48,18 +48,31 @@ class Dashboard extends CI_Controller {
             $canon_count   = $this->db->where(array('world_id' => $wid, 'status' => 'canon', 'is_archived' => 0))->count_all_results('entries');
             $draft_count   = $this->db->where(array('world_id' => $wid, 'status' => 'draft', 'is_archived' => 0))->count_all_results('entries');
 
-            // Fetch the 5 Archive Tome Categories with live counts
+            // Fetch the 5 Archive Prime Tomes and Extended Volumes with live counts
             $raw_types = $this->db->where('world_id', $wid)->order_by('sort_order', 'ASC')->get('entry_types')->result();
             $tome_meta = array(
-                'persons'   => array('tomus' => 'TOMUS I',   'latin' => 'LIBER PERSONARUM',   'desc' => 'Bloodlines, clanwardens, lamplighters, and sworn figures of note.'),
-                'realms'    => array('tomus' => 'TOMUS II',  'latin' => 'GAZETTEER OF REALMS', 'desc' => 'High keeps, basalt citadels, frozen passes, and sovereign seats.'),
-                'orders'    => array('tomus' => 'TOMUS III', 'latin' => 'SYNOD OF ORDERS',    'desc' => 'Inquisitorial synods, border cohorts, and ancient brotherhoods.'),
-                'bestiary'  => array('tomus' => 'TOMUS IV',  'latin' => 'RELIQUARY & BEASTS', 'desc' => 'Sanctified censers, runic arms, relics, and creatures of the veil.'),
-                'chronicle' => array('tomus' => 'TOMUS V',   'latin' => 'ANNALS OF THE AGES', 'desc' => 'Recorded wars, solstice covenants, treaties, and mythic epochs.'),
+                'characters' => array('tomus' => 'TOMUS I',   'latin' => 'LIBER PERSONARUM',      'desc' => 'Sworn champions, bloodlines, clanwardens, and mythic figures.'),
+                'nations'    => array('tomus' => 'TOMUS II',  'latin' => 'GAZETTEER OF IMPERIA',   'desc' => 'High keeps, basalt citadels, frozen passes, and sovereign seats.'),
+                'artifacts'  => array('tomus' => 'TOMUS III', 'latin' => 'CODEX RELIQUIARUM',     'desc' => 'Sanctified censers, ancient runic arms, talismans, and vessels of power.'),
+                'events'     => array('tomus' => 'TOMUS IV',  'latin' => 'ANNALES AETATUM',        'desc' => 'Recorded cataclysms, solstice crossings, covenants, and epochs.'),
+                'concepts'   => array('tomus' => 'TOMUS V',   'latin' => 'COMPENDIUM ARCANUM',    'desc' => 'Cosmic mysteries, primal laws, doctrines, and sacred traditions.'),
+                // Secondary / Extended volumes:
+                'orders'     => array('tomus' => 'TOMUS VI',  'latin' => 'SYNOD OF GUILDS',       'desc' => 'Inquisitorial synods, border cohorts, and chivalric houses.'),
+                'species'    => array('tomus' => 'TOMUS VII', 'latin' => 'BESTIARIUM PRIMORDIALIS','desc' => 'Ancient beasts, creatures of the veil, and indigenous races.'),
+                'locations'  => array('tomus' => 'TOMUS VIII','latin' => 'TABULA LOCORUM',       'desc' => 'Crumbling fortresses, ancient passes, shrines, and geographic landmarks.'),
+                'magic'      => array('tomus' => 'TOMUS IX',  'latin' => 'ARS OCCULTA',           'desc' => 'Schools of sorcery, elemental covenants, and metaphysical systems.'),
+                // Legacy slug fallbacks:
+                'persons'    => array('tomus' => 'TOMUS I',   'latin' => 'LIBER PERSONARUM',      'desc' => 'Sworn champions, bloodlines, clanwardens, and mythic figures.'),
+                'realms'     => array('tomus' => 'TOMUS II',  'latin' => 'GAZETTEER OF IMPERIA',   'desc' => 'High keeps, basalt citadels, frozen passes, and sovereign seats.'),
+                'bestiary'   => array('tomus' => 'TOMUS VII', 'latin' => 'BESTIARIUM PRIMORDIALIS','desc' => 'Ancient beasts, creatures of the veil, and indigenous races.'),
+                'chronicle'  => array('tomus' => 'TOMUS IV',  'latin' => 'ANNALES AETATUM',        'desc' => 'Recorded cataclysms, solstice crossings, covenants, and epochs.'),
             );
 
             $vol_idx = 1;
-            $romans = array(1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI');
+            $romans = array(1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI', 7 => 'VII', 8 => 'VIII', 9 => 'IX');
+            $prime_slugs = array('characters', 'nations', 'artifacts', 'events', 'concepts');
+            $extended_types = array();
+
             foreach ($raw_types as $t) {
                 $cnt = $this->db->where(array(
                     'world_id'      => $wid,
@@ -77,7 +90,13 @@ class Dashboard extends CI_Controller {
                     $t->latin = 'CODEX ARCHIVUM';
                     $t->tome_desc = $t->description ? $t->description : 'Inscribed lore records belonging to this volume.';
                 }
-                $entry_types[] = $t;
+
+                // Partition prime tomes (first 5) vs extended types
+                if (in_array($t->slug, $prime_slugs) || (count($entry_types) < 5 && $t->sort_order <= 5)) {
+                    $entry_types[] = $t;
+                } else {
+                    $extended_types[] = $t;
+                }
                 $vol_idx++;
             }
 
@@ -164,6 +183,7 @@ class Dashboard extends CI_Controller {
             'canon_count'        => $canon_count,
             'draft_count'        => $draft_count,
             'entry_types'        => $entry_types,
+            'extended_types'     => $extended_types,
             'recent_entries'     => $recent_entries,
             'featured_entry'     => $featured_entry,
             'featured_props'     => $featured_props,
@@ -331,11 +351,15 @@ class Dashboard extends CI_Controller {
             ));
 
             $default_types = array(
-                array('name' => 'Persons & Clans', 'slug' => 'persons', 'icon' => 'user', 'sort_order' => 1),
-                array('name' => 'Realms & Seats', 'slug' => 'realms', 'icon' => 'map-pin', 'sort_order' => 2),
-                array('name' => 'Sacred Orders', 'slug' => 'orders', 'icon' => 'shield', 'sort_order' => 3),
-                array('name' => 'Bestiary & Relics', 'slug' => 'bestiary', 'icon' => 'gem', 'sort_order' => 4),
-                array('name' => 'Chronicle & Eras', 'slug' => 'chronicle', 'icon' => 'history', 'sort_order' => 5),
+                array('name' => 'Personae & Bloodlines', 'slug' => 'characters', 'icon' => 'user', 'sort_order' => 1),
+                array('name' => 'Realms & Sovereign Nations', 'slug' => 'nations', 'icon' => 'map-pin', 'sort_order' => 2),
+                array('name' => 'Reliquary & Sacred Armaments', 'slug' => 'artifacts', 'icon' => 'gem', 'sort_order' => 3),
+                array('name' => 'Annals of Great Epochs', 'slug' => 'events', 'icon' => 'history', 'sort_order' => 4),
+                array('name' => 'Arcana, Doctrines & Lore', 'slug' => 'concepts', 'icon' => 'book-open', 'sort_order' => 5),
+                array('name' => 'Synod of Guilds & Orders', 'slug' => 'orders', 'icon' => 'shield', 'sort_order' => 6),
+                array('name' => 'Bestiary of Primal Beasts', 'slug' => 'species', 'icon' => 'feather', 'sort_order' => 7),
+                array('name' => 'Landmarks, Sites & Ruins', 'slug' => 'locations', 'icon' => 'compass', 'sort_order' => 8),
+                array('name' => 'Codex of Arcane Arts', 'slug' => 'magic', 'icon' => 'zap', 'sort_order' => 9),
             );
 
             foreach ($default_types as $t) {

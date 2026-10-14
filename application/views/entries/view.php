@@ -118,15 +118,23 @@
           </span>
         </div>
 
-        <!-- STRUCTURED ATTRIBUTES -->
+        <!-- STRUCTURED ATTRIBUTES / DOSSIER TELEMETRY -->
         <?php if (!empty($properties)): ?>
-          <div class="border-t-2 border-paper-line pt-3 font-mono text-xs divide-y divide-paper-line">
-            <?php foreach ($properties as $prop): ?>
-              <div class="flex justify-between py-2">
-                <span class="text-ash uppercase"><?php echo html_escape($prop->label); ?></span>
-                <span class="text-parchment font-bold"><?php echo html_escape($prop->value_text); ?></span>
-              </div>
-            <?php endforeach; ?>
+          <div class="border-t-2 border-paper-line pt-3 font-mono text-xs">
+            <div class="flex items-center justify-between pb-2 mb-1 border-b border-paper-line/60 text-[10px] uppercase tracking-wider text-copper">
+              <span>[DOSSIER ATTRIBUTES]</span>
+              <span>TELEMETRY</span>
+            </div>
+            <div class="divide-y divide-paper-line/60">
+              <?php foreach ($properties as $prop): ?>
+                <?php if (!empty($prop->value_text)): ?>
+                  <div class="flex flex-col sm:flex-row sm:justify-between py-2 gap-1">
+                    <span class="text-ash text-[10px] tracking-wider uppercase shrink-0"><?php echo html_escape($prop->label); ?></span>
+                    <span class="text-parchment font-bold text-xs sm:text-right"><?php echo html_escape($prop->value_text); ?></span>
+                  </div>
+                <?php endif; ?>
+              <?php endforeach; ?>
+            </div>
           </div>
         <?php endif; ?>
 

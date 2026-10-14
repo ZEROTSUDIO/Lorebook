@@ -178,30 +178,40 @@
             <div class="my-auto py-4 flex flex-col items-center text-center">
               <!-- Ornamental Medallion SVG per Tome Type -->
               <div class="w-14 h-14 rounded-full border-2 border-gold/50 group-hover:border-gold bg-paper-ink flex items-center justify-center mb-3 shadow-ink-sm transition">
-                <?php if ($tome->slug === 'persons'): ?>
+                <?php if ($tome->slug === 'characters' || $tome->slug === 'persons'): ?>
+                  <!-- Personae: Champion Bust / Silhouette -->
                   <svg class="w-7 h-7 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M5 20c0-3.866 3.134-7 7-7s7 3.134 7 7"/>
                   </svg>
-                <?php elseif ($tome->slug === 'realms'): ?>
+                <?php elseif ($tome->slug === 'nations' || $tome->slug === 'realms'): ?>
+                  <!-- Nations: Citadel / Fortress Keep -->
                   <svg class="w-7 h-7 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M3 21h18M5 21V7l4-3 3 3 3-3 4 3v14M9 21v-6h6v6"/>
                   </svg>
-                <?php elseif ($tome->slug === 'orders'): ?>
-                  <svg class="w-7 h-7 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M12 3l8 4v5c0 5.25-3.5 9.75-8 11-4.5-1.25-8-5.75-8-11V7l8-4z"/>
-                    <path d="M12 7v10M8 11h8"/>
-                  </svg>
-                <?php elseif ($tome->slug === 'bestiary'): ?>
+                <?php elseif ($tome->slug === 'artifacts'): ?>
+                  <!-- Reliquary: Sacred Censer & Gem Relic -->
                   <svg class="w-7 h-7 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <polygon points="12 2 19 8 16 21 8 21 5 8 12 2"/>
                     <line x1="12" y1="2" x2="12" y2="21"/>
                     <line x1="5" y1="8" x2="19" y2="8"/>
                   </svg>
-                <?php else: ?>
+                <?php elseif ($tome->slug === 'events' || $tome->slug === 'chronicle'): ?>
+                  <!-- Annals: Orbit / Sundial / Epoch -->
                   <svg class="w-7 h-7 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <circle cx="12" cy="12" r="9"/>
                     <polyline points="12 7 12 12 15 15"/>
+                  </svg>
+                <?php elseif ($tome->slug === 'concepts'): ?>
+                  <!-- Arcana: Open Codex & Arcane Spark -->
+                  <svg class="w-7 h-7 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                  </svg>
+                <?php else: ?>
+                  <svg class="w-7 h-7 text-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="9"/>
+                    <polygon points="12 8 8 12 12 16 16 12 12 8"/>
                   </svg>
                 <?php endif; ?>
               </div>
@@ -231,6 +241,80 @@
         </a>
       <?php endforeach; ?>
     </div>
+
+    <?php if (!empty($extended_types)): ?>
+      <!-- Extended Volumes Shelf Strip (Orders, Species, Locations, Magic) -->
+      <div class="mt-2 pt-4 border-t border-paper-line/70">
+        <div class="flex items-center justify-between mb-3 font-mono text-[10px] tracking-widest uppercase">
+          <span class="text-copper flex items-center gap-2">
+            <span class="w-1.5 h-1.5 bg-copper"></span>
+            EXTENDED ARCHIVES &amp; SECONDARY REGISTRIES (VOL. VI &mdash; IX)
+          </span>
+          <span class="text-ash hidden sm:inline">SWORN ORDERS · BESTIARY · SITES · CODEX ARCANUM</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <?php foreach ($extended_types as $ext): ?>
+            <a
+              href="<?php echo base_url('entries?type=' . urlencode($ext->slug)); ?>"
+              class="group bg-paper-ink border-2 border-paper-line hover:border-gold p-3 flex items-center justify-between transition shadow-ink-sm"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded border border-gold/40 group-hover:border-gold bg-paper-panel flex items-center justify-center text-gold transition shrink-0 shadow-inner">
+                  <?php if ($ext->slug === 'orders'): ?>
+                    <!-- Shield icon -->
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M12 3l8 4v5c0 5.25-3.5 9.75-8 11-4.5-1.25-8-5.75-8-11V7l8-4z"/>
+                    </svg>
+                  <?php elseif ($ext->slug === 'species' || $ext->slug === 'bestiary'): ?>
+                    <!-- Feather / Beast icon -->
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/>
+                      <line x1="16" y1="8" x2="2" y2="22"/>
+                      <line x1="17.5" y1="15" x2="9" y2="15"/>
+                    </svg>
+                  <?php elseif ($ext->slug === 'locations'): ?>
+                    <!-- Compass icon -->
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                    </svg>
+                  <?php elseif ($ext->slug === 'magic'): ?>
+                    <!-- Arcane Zap icon -->
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                  <?php else: ?>
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <circle cx="12" cy="12" r="9"/>
+                      <polyline points="12 7 12 12 15 15"/>
+                    </svg>
+                  <?php endif; ?>
+                </div>
+
+                <div class="overflow-hidden">
+                  <div class="font-mono text-[9px] uppercase tracking-wider text-copper truncate">
+                    <?php echo html_escape($ext->tomus); ?> &bull; <?php echo html_escape($ext->latin); ?>
+                  </div>
+                  <div class="font-display font-bold text-sm uppercase text-parchment group-hover:text-gold transition truncate">
+                    <?php echo html_escape($ext->name); ?>
+                  </div>
+                </div>
+              </div>
+
+              <div class="text-right shrink-0 pl-2">
+                <span class="font-mono text-[11px] text-parchment-dim font-bold block">
+                  <?php echo sprintf('%02d', (int)$ext->entry_count); ?>
+                </span>
+                <span class="font-mono text-[9px] text-gold uppercase group-hover:underline">
+                  OPEN &rarr;
+                </span>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    <?php endif; ?>
   </section>
 
 
