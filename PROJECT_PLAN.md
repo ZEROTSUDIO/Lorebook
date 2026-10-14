@@ -212,12 +212,16 @@ lorekeeper/
 - [x] Bidirectional `[[Wiki Link]]` resolution with gold links for canon entries and copper `[＋]` redlinks for unwritten concepts.
 - [ ] Dedicated Schema-driven template & property manager UI (dedicated manager to add/remove custom property definitions per entry type outside of code seeds).
 
-### Milestone 3: Directed Relationships & Chronology (In Progress)
+### Milestone 3: Directed Relationships, Chronology & Seed Vault (Completed)
 - [x] Automatic backlink index on every entry page (`entries/view.php`).
 - [x] 3-Layer Fictional Calendar DB Schema (`sort_year`, `end_year`, `is_approximate`).
 - [x] Frontispiece Chronology Ribbon on Dashboard (horizontal chronological node tape).
+- [x] Directed Relationship Matrix UI & Graph Explorer (`/relationships` and inline binder in `entries/view.php` with predicate presets: `bearer of`, `sworn warden of`, `sworn ally of`, `opposed to`, `staging ground of`, etc.).
+- [x] Master World Data Seeder Template & Blueprint (`application/seeds/World_seeder_template.php`).
+- [x] Canaan Realm Expansion Seeder (`application/seeds/Canaan_expansion_seeder.php`) bringing Canaan to 100% complete coverage across all 9 archetypes, 13 directed graph bonds, and signed-year timeline records.
+- [x] Multi-Genre Seeders: High-Tech Cyberpunk (`application/seeds/Cyberpunk_seeder.php`) and Maritime Archipelago Fantasy (`application/seeds/Aethelgard_seeder.php`).
+- [x] Seed Vault Browser & Idempotent Runner UI (`/seed` via `application/controllers/Seed.php` and `application/views/seed/index.php`).
 - [ ] Dedicated Chronological Timeline Hub (`/timeline` or `/entries/chronology`) with era grouping and filtering.
-- [ ] Directed Relationship Matrix UI (inter-entity connection binder: `is_ruler_of`, `sworn_ally_to`, `nemesis_of`, etc.).
 
 ### Milestone 4: Media Vault & Attachments
 - [ ] Secure local image upload system (`media_attachments`) with hashed filenames and metadata tracking.

@@ -246,6 +246,128 @@
 
     </article>
 
+    <!-- ================================================================= -->
+    <!-- SWORN BONDS & TIES // DIRECTED RELATIONSHIP MATRIX                -->
+    <!-- ================================================================= -->
+    <section class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
+      <!-- Flush Header -->
+      <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-gold rotate-45"></span>
+          <span class="text-gold font-bold tracking-widest uppercase">SWORN BONDS &amp; TIES // RELATIONSHIP MATRIX</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-ash text-[10px]">
+            <?php echo count($outbound_relationships) + count($inbound_relationships); ?> ACTIVE BONDS
+          </span>
+          <button type="button" onclick="document.getElementById('forge-bond-modal').classList.remove('hidden')" class="border border-gold text-gold hover:bg-gold hover:text-paper-ink px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition">
+            ＋ FORGE BOND
+          </button>
+        </div>
+      </div>
+
+      <div class="p-5 flex flex-col gap-6">
+        
+        <?php if (empty($outbound_relationships) && empty($inbound_relationships)): ?>
+          <div class="text-center py-6 border border-dashed border-paper-line">
+            <p class="font-prose italic text-sm text-ash mb-3">No sworn bonds or alliances recorded for this entity yet.</p>
+            <button type="button" onclick="document.getElementById('forge-bond-modal').classList.remove('hidden')" class="border-2 border-gold px-4 py-1.5 font-mono text-xs text-gold hover:bg-gold hover:text-paper-ink uppercase tracking-wider transition font-bold shadow-ink-sm">
+              [＋ FORGE FIRST BOND]
+            </button>
+          </div>
+        <?php endif; ?>
+
+        <!-- OUTBOUND BONDS (This Entry -> Target) -->
+        <?php if (!empty($outbound_relationships)): ?>
+          <div>
+            <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-3 flex items-center gap-2">
+              <span>▶ OUTGOING CONNECTIONS (ORIGINATED BONDS)</span>
+              <span class="flex-1 h-px bg-paper-line/50"></span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <?php foreach ($outbound_relationships as $ob): ?>
+                <div class="bg-paper-base border border-paper-line hover:border-gold p-3.5 shadow-ink-sm flex flex-col justify-between transition group relative">
+                  <div>
+                    <div class="flex items-center justify-between font-mono text-[10px] mb-1.5">
+                      <span class="px-2 py-0.5 bg-paper-deep border border-gold/50 text-gold font-bold tracking-wider uppercase">
+                        <?php echo html_escape($ob->relationship_type); ?> &rarr;
+                      </span>
+                      <span class="text-ash uppercase text-[9px]"><?php echo html_escape($ob->target_type_name); ?></span>
+                    </div>
+
+                    <a href="<?php echo base_url('entries/view/' . $ob->target_id); ?>" class="font-display font-bold text-lg uppercase tracking-wide text-parchment hover:text-gold transition block">
+                      <?php echo html_escape($ob->target_title); ?>
+                    </a>
+
+                    <?php if (!empty($ob->description)): ?>
+                      <p class="font-prose text-xs text-parchment-dim mt-1.5 leading-relaxed italic">
+                        “<?php echo html_escape($ob->description); ?>”
+                      </p>
+                    <?php endif; ?>
+                  </div>
+
+                  <div class="border-t border-paper-line/70 pt-2 mt-3 flex items-center justify-between font-mono text-[10px]">
+                    <span class="text-ash text-[9px]">INVERSE: <?php echo html_escape($ob->inverse_label); ?></span>
+                    <form action="<?php echo base_url('relationships/delete/' . $ob->id); ?>" method="POST" onsubmit="return confirm('Dissolve this bond between <?php echo html_escape($entry->title); ?> and <?php echo html_escape($ob->target_title); ?>?');" class="inline">
+                      <button type="submit" class="text-crimson hover:underline uppercase text-[9px] tracking-wider">
+                        [✕ UNBIND]
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        <?php endif; ?>
+
+        <!-- INBOUND BONDS (Source -> This Entry) -->
+        <?php if (!empty($inbound_relationships)): ?>
+          <div>
+            <div class="font-mono text-[10px] text-gold uppercase tracking-widest mb-3 flex items-center gap-2">
+              <span>◀ INCOMING CONNECTIONS (RECIPROCAL TIES)</span>
+              <span class="flex-1 h-px bg-paper-line/50"></span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <?php foreach ($inbound_relationships as $ib): ?>
+                <div class="bg-paper-base border border-paper-line hover:border-gold p-3.5 shadow-ink-sm flex flex-col justify-between transition group relative">
+                  <div>
+                    <div class="flex items-center justify-between font-mono text-[10px] mb-1.5">
+                      <span class="px-2 py-0.5 bg-paper-deep border border-copper/50 text-copper font-bold tracking-wider uppercase">
+                        &larr; <?php echo html_escape($ib->inverse_label); ?>
+                      </span>
+                      <span class="text-ash uppercase text-[9px]"><?php echo html_escape($ib->source_type_name); ?></span>
+                    </div>
+
+                    <a href="<?php echo base_url('entries/view/' . $ib->source_id); ?>" class="font-display font-bold text-lg uppercase tracking-wide text-parchment hover:text-gold transition block">
+                      <?php echo html_escape($ib->source_title); ?>
+                    </a>
+
+                    <?php if (!empty($ib->description)): ?>
+                      <p class="font-prose text-xs text-parchment-dim mt-1.5 leading-relaxed italic">
+                        “<?php echo html_escape($ib->description); ?>”
+                      </p>
+                    <?php endif; ?>
+                  </div>
+
+                  <div class="border-t border-paper-line/70 pt-2 mt-3 flex items-center justify-between font-mono text-[10px]">
+                    <span class="text-ash text-[9px]">FORWARD: <?php echo html_escape($ib->relationship_type); ?></span>
+                    <form action="<?php echo base_url('relationships/delete/' . $ib->id); ?>" method="POST" onsubmit="return confirm('Dissolve this bond between <?php echo html_escape($ib->source_title); ?> and <?php echo html_escape($entry->title); ?>?');" class="inline">
+                      <button type="submit" class="text-crimson hover:underline uppercase text-[9px] tracking-wider">
+                        [✕ UNBIND]
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        <?php endif; ?>
+
+      </div>
+    </section>
+
     <!-- BACKLINKS / REFERENCED IN OTHER CHRONICLES -->
     <?php if (!empty($backlinks)): ?>
       <section class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
@@ -285,3 +407,104 @@
   </main>
 
 </div>
+
+<!-- ================================================================= -->
+<!-- QUICK-BIND MODAL: FORGE NEW BOND                                  -->
+<!-- ================================================================= -->
+<div id="forge-bond-modal" class="fixed inset-0 bg-paper-ink/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-paper-panel border-2 border-gold max-w-lg w-full p-6 shadow-ink-lg relative">
+    <div class="flex items-center justify-between border-b-2 border-paper-line pb-3 mb-4 font-mono text-xs">
+      <span class="text-gold font-bold tracking-widest uppercase flex items-center gap-2">
+        <span class="w-2 h-2 bg-gold rotate-45"></span> FORGE DIRECTED BOND
+      </span>
+      <button type="button" onclick="document.getElementById('forge-bond-modal').classList.add('hidden')" class="text-ash hover:text-gold text-base leading-none">
+        ✕
+      </button>
+    </div>
+
+    <form action="<?php echo base_url('relationships/store'); ?>" method="POST" class="flex flex-col gap-4 font-mono text-xs">
+      <input type="hidden" name="source_entry_id" value="<?php echo (int)$entry->id; ?>">
+
+      <!-- Source Origin Indicator -->
+      <div class="bg-paper-base border border-paper-line p-2 text-[11px] text-parchment flex items-center justify-between">
+        <span class="text-ash uppercase">SOURCE ORIGIN:</span>
+        <strong class="text-gold uppercase"><?php echo html_escape($entry->title); ?></strong>
+      </div>
+
+      <!-- Target Entity Select -->
+      <div class="flex flex-col gap-1">
+        <label for="target_entry_id" class="text-[10px] text-copper uppercase tracking-wider font-bold">CONNECT TO TARGET ENTITY *</label>
+        <select name="target_entry_id" id="target_entry_id" required class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-2 text-parchment outline-none transition cursor-pointer">
+          <option value="">-- Select Connected Entity --</option>
+          <?php if (!empty($other_entries)): ?>
+            <?php foreach ($other_entries as $oe): ?>
+              <option value="<?php echo $oe->id; ?>">
+                <?php echo html_escape($oe->title); ?> (<?php echo html_escape($oe->type_name); ?>)
+              </option>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </select>
+      </div>
+
+      <!-- Predicate Preset Selector -->
+      <div class="flex flex-col gap-1">
+        <label for="preset_selector" class="text-[10px] text-ash uppercase tracking-wider">PRESET TEMPLATES</label>
+        <select id="preset_selector" onchange="applyPreset(this.value)" class="w-full bg-paper-base border border-paper-line focus:border-gold px-2.5 py-1.5 text-parchment-dim outline-none transition cursor-pointer text-[11px]">
+          <option value="">-- Choose Common Preset --</option>
+          <option value="bearer of|wielded by">Bearer / Wielder (bearer of &harr; wielded by)</option>
+          <option value="sworn ally of|sworn ally of">Alliance (sworn ally of &harr; sworn ally of)</option>
+          <option value="sworn warden of|protected by">Guardian (sworn warden of &harr; protected by)</option>
+          <option value="sworn scout of|scouted by">Scout (sworn scout of &harr; scouted by)</option>
+          <option value="sworn comrade of|sworn comrade of">Comrade (sworn comrade of &harr; sworn comrade of)</option>
+          <option value="sworn member of|has member">Membership (sworn member of &harr; has member)</option>
+          <option value="rules / commands|ruled by">Sovereignty (rules / commands &harr; ruled by)</option>
+          <option value="opposed to|ideological rival of">Rivalry (opposed to &harr; ideological rival of)</option>
+          <option value="nemesis of|nemesis of">Nemesis (nemesis of &harr; nemesis of)</option>
+          <option value="located in|seat of power for">Geography (located in &harr; seat of power for)</option>
+          <option value="forged / created|crafted by">Creation (forged / created &harr; crafted by)</option>
+          <option value="staging ground of|staged from">Event Staging (staging ground of &harr; staged from)</option>
+        </select>
+      </div>
+
+      <!-- Forward & Inverse Predicates -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <label for="relationship_type" class="text-[10px] text-gold uppercase tracking-wider font-bold">FORWARD PREDICATE *</label>
+          <input type="text" name="relationship_type" id="relationship_type" required placeholder="e.g. bearer of" class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-1.5 text-parchment outline-none transition text-xs">
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <label for="inverse_label" class="text-[10px] text-ash uppercase tracking-wider">INVERSE LABEL</label>
+          <input type="text" name="inverse_label" id="inverse_label" placeholder="e.g. wielded by" class="w-full bg-paper-base border border-paper-line focus:border-gold px-3 py-1.5 text-parchment outline-none transition text-xs">
+        </div>
+      </div>
+
+      <!-- Description / Context Note -->
+      <div class="flex flex-col gap-1">
+        <label for="description" class="text-[10px] text-ash uppercase tracking-wider">LORE CONTEXT NOTE [OPTIONAL]</label>
+        <textarea name="description" id="description" rows="2" placeholder="e.g. Sanctified during the Solstice Crossing of 842 2A..." class="w-full bg-paper-base border border-paper-line focus:border-gold px-3 py-1.5 text-parchment outline-none transition text-xs resize-none"></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex items-center justify-end gap-2 border-t border-paper-line pt-3 mt-1">
+        <button type="button" onclick="document.getElementById('forge-bond-modal').classList.add('hidden')" class="px-4 py-2 border border-paper-line text-ash hover:text-parchment transition uppercase text-[11px]">
+          CANCEL
+        </button>
+        <button type="submit" class="px-5 py-2 border-2 border-gold bg-gold hover:bg-gold-light text-paper-ink font-bold transition uppercase tracking-wider text-xs shadow-ink-sm">
+          FORGE BOND ➔
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function applyPreset(val) {
+    if (!val) return;
+    const parts = val.split('|');
+    if (parts.length === 2) {
+      document.getElementById('relationship_type').value = parts[0];
+      document.getElementById('inverse_label').value = parts[1];
+    }
+  }
+</script>

@@ -53,6 +53,14 @@
       </div>
     </div>
 
+    <a href="<?php echo base_url('relationships'); ?>" class="px-3 py-1.5 border-2 <?php echo ($current_tab === 'relationships') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> flex items-center gap-1.5 transition">
+      <span class="text-gold">❖</span> BONDS MATRIX
+    </a>
+
+    <a href="<?php echo base_url('seed'); ?>" class="px-3 py-1.5 border-2 <?php echo ($current_tab === 'seed') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> flex items-center gap-1.5 transition">
+      <span class="text-copper">⚡</span> SEED VAULT
+    </a>
+
     <a href="<?php echo base_url('entries/create'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'create') ? 'border-gold text-paper-ink bg-gold font-bold shadow-ink-sm' : 'border-gold/70 text-gold-light hover:border-gold hover:text-white bg-paper-deep shadow-ink-sm'; ?> transition flex items-center gap-1.5">
       <span class="font-bold">＋</span> INSCRIBE ENTRY
     </a>

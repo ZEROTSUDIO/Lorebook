@@ -365,23 +365,56 @@ class Entries extends CI_Controller {
             }
         }
 
+        // 3. Query Outbound Relationships (Where this entry is source)
+        $this->db->select('er.*, tgt.id as target_id, tgt.title as target_title, tgt.slug as target_slug, tgt.status as target_status, tgt_t.name as target_type_name, tgt_t.slug as target_type_slug');
+        $this->db->from('entry_relationships er');
+        $this->db->join('entries tgt', 'tgt.id = er.target_entry_id', 'inner');
+        $this->db->join('entry_types tgt_t', 'tgt_t.id = tgt.entry_type_id', 'left');
+        $this->db->where('er.source_entry_id', $id);
+        $this->db->where('er.world_id', $world_id);
+        $this->db->where('tgt.is_archived', 0);
+        $this->db->order_by('er.id', 'ASC');
+        $outbound_relationships = $this->db->get()->result();
+
+        // 4. Query Inbound Relationships (Where this entry is target)
+        $this->db->select('er.*, src.id as source_id, src.title as source_title, src.slug as source_slug, src.status as source_status, src_t.name as source_type_name, src_t.slug as source_type_slug');
+        $this->db->from('entry_relationships er');
+        $this->db->join('entries src', 'src.id = er.source_entry_id', 'inner');
+        $this->db->join('entry_types src_t', 'src_t.id = src.entry_type_id', 'left');
+        $this->db->where('er.target_entry_id', $id);
+        $this->db->where('er.world_id', $world_id);
+        $this->db->where('src.is_archived', 0);
+        $this->db->order_by('er.id', 'ASC');
+        $inbound_relationships = $this->db->get()->result();
+
+        // 5. Fetch other active entries for the "+ Forge Bond" modal
+        $other_entries = $this->db->select('entries.id, entries.title, entries.slug, entry_types.name as type_name')
+                                  ->from('entries')
+                                  ->join('entry_types', 'entry_types.id = entries.entry_type_id', 'left')
+                                  ->where(array('entries.world_id' => $world_id, 'entries.id !=' => $id, 'entries.is_archived' => 0))
+                                  ->order_by('entries.title', 'ASC')
+                                  ->get()->result();
+
         $user_id = $this->session->userdata('user_id');
         $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
 
         $data = array(
-            'page_title'     => $entry->title,
-            'header_title'   => $entry->title,
-            'sub_heading'    => 'DOSSIER // ' . strtoupper($entry->type_name),
-            'header_caption' => 'Codex Entry Public ID: ' . $entry->public_id,
-            'active_tab'     => $entry->type_slug,
-            'active_world'   => $active_world,
-            'current_user'   => $current_user,
-            'entry'          => $entry,
-            'properties'     => $properties,
-            'tags'           => $tags,
-            'parsed_content' => $parsed_content,
-            'backlinks'      => $backlinks,
-            'content_view'   => 'entries/view',
+            'page_title'             => $entry->title,
+            'header_title'           => $entry->title,
+            'sub_heading'            => 'DOSSIER // ' . strtoupper($entry->type_name),
+            'header_caption'         => 'Codex Entry Public ID: ' . $entry->public_id,
+            'active_tab'             => $entry->type_slug,
+            'active_world'           => $active_world,
+            'current_user'           => $current_user,
+            'entry'                  => $entry,
+            'properties'             => $properties,
+            'tags'                   => $tags,
+            'parsed_content'         => $parsed_content,
+            'backlinks'              => $backlinks,
+            'outbound_relationships' => $outbound_relationships,
+            'inbound_relationships'  => $inbound_relationships,
+            'other_entries'          => $other_entries,
+            'content_view'           => 'entries/view',
         );
 
         $this->load->view('layouts/main', $data);
