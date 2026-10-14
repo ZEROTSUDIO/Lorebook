@@ -91,13 +91,66 @@ erDiagram
 1. **`users`**: Account registry (`id`, `public_id`, `username`, `email`, `password_hash`, `display_name`, `avatar`, `role`, `is_active`).
 2. **`world_members`**: Collaboration and world permissions (`world_id`, `user_id`, `role`).
 3. **`worlds`**: Multi-universe support (`id`, `public_id`, `owner_id`, `name`, `slug`, `visibility`, `description`).
-4. **`entry_types`**: Configurable templates (`Character`, `Location`, `Faction`, `Artifact`, `Historical Event`, `Magic System`).
+4. **`entry_types`**: Configurable templates (`Persons & Clans`, `Realms & Seats`, `Sacred Orders`, `Bestiary & Relics`, `Chronicle & Eras`).
 5. **`entries`**: Core entity record (`id`, `public_id`, `world_id`, `entry_type_id`, `title`, `slug`, `summary`, `content_markdown`, `status`, `is_archived`, `created_by`, `updated_by`).
 6. **`property_definitions` & `property_values`**: EAV-style typed custom fields (`value_text`, `value_number`, `value_boolean`, `value_date`, `referenced_entry_id`) preventing frequent table alter migrations.
-7. **`entry_relationships`**: Directed typed edges (`source_id`, `target_id`, `relationship_type`, `description`).
-8. **`timeline_events`**: Historical chronology supporting in-universe fictional eras and custom precision sort keys.
+7. **`entry_relationships`**: Directed typed edges (`source_entry_id`, `target_entry_id`, `relationship_type`, `inverse_label`, `description`).
+8. **`timeline_events`**: Historical chronology supporting in-universe fictional eras (`sort_year`, `end_year`, `is_approximate`).
 9. **`tags` & `entry_tags`**: Cross-cutting classification labels.
 10. **`media_attachments`**: Uploaded portrait and document metadata.
+11. **`app_settings`**: Key-value settings table scoped per world for compendium annals, pillars, and telemetry.
+
+### 4.3 The 5-Layer Entry Architecture
+Every lore record is structured into five distinct, decoupled layers:
+- **Layer 1: Identity** — Title, Slug, Entry Type, Summary, Status (`canon`, `draft`, `apocrypha`, `retconned`), Tags, and Author attribution (`Archivist Zerotsu`).
+- **Layer 2: Structured Properties** — EAV custom fields dynamically rendered per `entry_type` (e.g. Origin Seat, Clan, Arcane Aspect, Current Ruler, Potency).
+- **Layer 3: Article Body** — Full grimoire prose written in Markdown with illuminated drop-caps, ornamental dividers, quotes, and interactive live preview.
+- **Layer 4: Dual Connection System** —
+  - **A. Explicit Directed Relationships** (`entry_relationships`): Semantic, typed directional bonds with inverse labels (e.g. `bearer of` $\leftrightarrow$ `wielded by`).
+  - **B. Internal Article Wiki Links** (`[[Wiki Links]]`): Inline prose references linking entities with automatic backlink indexing and unwritten redlink discovery (`[＋]`).
+- **Layer 5: Management & Canon Protection** — Verification badges, audit timestamps, soft-delete archiving, and restoration protocol.
+
+### 4.4 Directed Relationship Matrix Specification
+The relationship matrix enables semantic graph exploration across entries:
+- **Directional Predicates**: Forward predicate (`relationship_type`) paired with an inverse label (`inverse_label`).
+- **Categorized Presets**:
+  - *Allegiance & Rule*: `rules / commands` $\leftrightarrow$ `ruled by`, `sworn ally of` $\leftrightarrow$ `sworn ally of`, `vassal to` $\leftrightarrow$ `liege of`
+  - *Blood & Lineage*: `parent of` $\leftrightarrow$ `child of`, `sibling of` $\leftrightarrow$ `sibling of`
+  - *Conflict & Rivalry*: `nemesis of` $\leftrightarrow$ `nemesis of`, `rebelled against` $\leftrightarrow$ `betrayed by`
+  - *Relics & Arcana*: `bearer of` $\leftrightarrow$ `wielded by`, `forged / created` $\leftrightarrow$ `crafted by`
+  - *Geography*: `seat located in` $\leftrightarrow$ `seat of power for`
+- **Contextual Annotation**: An optional `description` string detailing when or why the bond was forged.
+- **Dossier Matrix UI**: Displayed as "Sworn Bonds & Ties" on `entries/view.php` with direct inline creation via quick-bind modal.
+
+### 4.5 Expanded 9-Archetype Entry Taxonomy & Structured Bio Schemas
+To support granular RPG-level character sheets, kingdoms, and magic systems, Lorekeeper expands into 9 distinct Entry Archetypes, each with dedicated Structured Property Definitions (`property_definitions`):
+
+| Archetype / Type | Primary Focus | Dedicated Structured Attributes (`property_definitions`) |
+| :--- | :--- | :--- |
+| **1. Character** | Named individuals & historical figures | `species`, `age`, `occupation`, `origin_seat`, `clan`, `weapon`, `aspect`, `abilities` |
+| **2. Creature / Species** | Flora, fauna, races, and legendary monsters | `classification`, `average_lifespan`, `habitat`, `diet`, `innate_traits`, `threat_level` |
+| **3. Location** | Natural geography, rivers, ruins, and sites | `region`, `coordinates_terrain`, `climate`, `controlling_faction`, `points_of_interest` |
+| **4. Nation / Political State** | Sovereign kingdoms, empires, and duchies | `government_type`, `current_ruler`, `capital_seat`, `population`, `dominant_military` |
+| **5. Organization / Faction** | Guilds, inquisitions, brotherhoods, cults | `leader_title`, `headquarters`, `doctrine_alignment`, `sigil_crest`, `membership_size` |
+| **6. Item / Artifact** | Relics, armaments, tomes, arcane vessels | `item_class`, `origin_creator`, `materials_forged`, `bearer_wielder`, `arcane_potency` |
+| **7. Magic / Power System** | Arcane arts, alchemy, divine covenants | `source_of_power`, `practitioner_type`, `limitations_taboos`, `manifestation_cost` |
+| **8. Event** | Solstice crossings, treaties, wars, cataclysms | `era_epoch`, `exact_date`, `belligerents_participants`, `outcome_treaty`, `legacy` |
+| **9. Concept / Lore Record** | Cosmic myths, philosophies, laws of nature | `sphere_of_influence`, `sacred_texts`, `cultural_significance` |
+
+#### Detailed Character Bio & Equipment Specification
+For **Characters**, the Layer 2 attribute card in [`entries/view.php`](file:///c:/xampp/htdocs/Lorekeeper/application/views/entries/view.php) and editor displays:
+- **Biographical Data**:
+  - `Species / Race` (e.g. *Human*, *Draugar*, *Sylph*, *Construct*)
+  - `Age / Lifespan` (e.g. *34 Cycles*, *Immortal*, *Centuries-old*)
+  - `Title / Occupation` (e.g. *First Lamplighter*, *Border Scout*, *Grand Inquisitor*)
+  - `Origin Seat` (e.g. *The Frost Keep*, *Valorian Court*)
+  - `Cohort / Clan` (e.g. *Draugar Bloodline*, *Voss Syndicate*)
+- **Combat & Arsenal**:
+  - `Signature Weapon` (e.g. *Meteoric Broadsword*, *Censer of the North*, *Dual Runic Hatchets*)
+  - `Armor / Regalia` (e.g. *Basalt-Plated Vanguard Coat*)
+- **Arcana & Arts**:
+  - `Arcane Aspect` (e.g. *Pale Flame Pyromancy*, *Rime-Weaving*, *Void-Tuning*)
+  - `Signature Abilities / Arts` (e.g. *Covenant Flame Stance*, *Hidden Pass Wayfinding*)
 
 ---
 
@@ -144,7 +197,8 @@ lorekeeper/
 ### Milestone 1: Project Foundation & World Scoping (Completed)
 - [x] UI Prototype and Design Language established (`mockup-zerostudios.html`).
 - [x] Initialize clean CodeIgniter 3 structure in `c:\xampp\htdocs\Lorekeeper`.
-- [x] Implement database migrations (`001` through `010`) including `users`, `world_members`, `worlds`, `entry_types`, `entries`, `properties`, `relationships`, `tags`, `timeline`, `media`, and `app_settings`.
+- [x] Implement database migrations (`001` through `011`) including `users`, `world_members`, `worlds`, `entry_types`, `entries`, `properties` (with 8-field Character Bio data), `relationships`, `tags`, `timeline`, `media`, `app_settings`, and 9-Archetype Taxonomy.
+- [x] Refactor 5 Prime Grimoire Tomes on Shelf (`Personae`, `Nations`, `Artifacts`, `Annals`, `Arcana`) with secondary Extended Volumes navigation (`Orders`, `Species`, `Locations`, `Magic`).
 - [x] Build modular layout shell (`head`, `topbar`, `header`, `footer`, `layouts/main`) and auto-seeding `Dashboard`.
 - [x] Dynamic World Compendium & Atlas preferences via `app_settings` per world.
 - [x] World Switcher dropdown & Multi-World Genesis creator (`worlds/create`).
