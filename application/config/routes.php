@@ -57,5 +57,11 @@ $route['entries/create'] = 'entries/create';
 $route['entries/store'] = 'entries/store';
 $route['entries/view/(:num)'] = 'entries/view/$1';
 
+$route['media/upload'] = 'media/upload';
+$route['media/set_cover'] = 'media/set_cover';
+$route['media/remove_cover'] = 'media/remove_cover';
+$route['media/gallery/(:any)'] = 'media/gallery/$1';
+$route['media/delete/(:num)'] = 'media/delete/$1';
+
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

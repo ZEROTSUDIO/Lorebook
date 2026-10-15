@@ -54,28 +54,109 @@
 
       <div class="p-5 flex flex-col gap-5">
         
-        <!-- PORTRAIT CONTAINER -->
-        <div class="relative bg-paper-base border-2 border-paper-line p-2 shadow-ink-sm corner-brackets">
-          <div class="h-64 sm:h-72 bg-paper-deep flex flex-col items-center justify-end pb-4 border border-dashed border-paper-line relative overflow-hidden">
-            
-            <!-- Watermark Rune -->
-            <svg class="absolute inset-0 m-auto w-40 h-40 opacity-10 text-gold" viewBox="0 0 100 100" fill="currentColor">
-              <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" fill="none" stroke="currentColor" stroke-width="2"/>
-              <circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="50" y1="5" x2="50" y2="95" stroke="currentColor" stroke-width="1"/>
-              <line x1="10" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="1"/>
-            </svg>
+        <?php
+          $has_cover = false;
+          $cover_url = '';
+          if (!empty($entry->cover_image)) {
+              if (strpos($entry->cover_image, 'http://') === 0 || strpos($entry->cover_image, 'https://') === 0) {
+                  $has_cover = true;
+                  $cover_url = $entry->cover_image;
+              } elseif (file_exists(FCPATH . $entry->cover_image)) {
+                  $has_cover = true;
+                  $cover_url = base_url($entry->cover_image);
+              } elseif (file_exists(FCPATH . 'storage/media/' . $entry->cover_image)) {
+                  $has_cover = true;
+                  $cover_url = base_url('storage/media/' . $entry->cover_image);
+              }
+          }
+        ?>
 
-            <span class="absolute top-2 left-2 text-[11px] font-mono text-gold/60">+</span>
-            <span class="absolute top-2 right-2 text-[11px] font-mono text-gold/60">+</span>
-            <span class="absolute bottom-2 left-2 text-[11px] font-mono text-gold/60">+</span>
-            <span class="absolute bottom-2 right-2 text-[11px] font-mono text-gold/60">+</span>
+        <!-- ILLUMINATED DOSSIER PORTRAIT & DROPZONE -->
+        <div id="portrait-frame-container" class="relative bg-paper-base border-2 border-paper-line p-2 shadow-ink-sm corner-brackets group transition-all duration-300">
+          
+          <!-- CORNER RETICLES -->
+          <span class="absolute top-1 left-1 text-[11px] font-mono text-gold/60 z-20 pointer-events-none">+</span>
+          <span class="absolute top-1 right-1 text-[11px] font-mono text-gold/60 z-20 pointer-events-none">+</span>
+          <span class="absolute bottom-1 left-1 text-[11px] font-mono text-gold/60 z-20 pointer-events-none">+</span>
+          <span class="absolute bottom-1 right-1 text-[11px] font-mono text-gold/60 z-20 pointer-events-none">+</span>
+
+          <!-- INNER CANVAS -->
+          <div id="portrait-dropzone" 
+               class="min-h-[260px] sm:min-h-[300px] max-h-[460px] bg-paper-deep border border-paper-line/80 relative overflow-hidden flex flex-col items-center justify-center transition-colors duration-200"
+               ondragover="handlePortraitDragOver(event)"
+               ondragleave="handlePortraitDragLeave(event)"
+               ondrop="handlePortraitDrop(event)">
             
-            <span class="font-display italic text-lg text-copper mb-1">[Illuminated Art]</span>
-            <span class="font-mono text-[10px] text-ash tracking-widest uppercase">
-              <?php echo !empty($entry->cover_image) ? html_escape($entry->cover_image) : 'NO_PORTRAIT_SPECIFIED'; ?>
-            </span>
+            <!-- A. IMAGE VIEW (When portrait exists) -->
+            <div id="portrait-image-wrapper" class="<?php echo $has_cover ? '' : 'hidden'; ?> w-full h-full relative group/img">
+              <img id="dossier-portrait-img" 
+                   src="<?php echo html_escape($cover_url); ?>" 
+                   alt="<?php echo html_escape($entry->title); ?>" 
+                   onclick="openLightbox(this.src, '<?php echo html_escape(addslashes($entry->title)); ?>')"
+                   class="w-full h-full object-cover object-top transition duration-500 group-hover/img:scale-105 cursor-pointer max-h-[440px]">
+              
+              <!-- Subtle bottom gradient vignette -->
+              <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-paper-ink/90 via-paper-ink/30 to-transparent pointer-events-none"></div>
+              
+              <!-- Hover Overlay Controls -->
+              <div class="absolute inset-x-0 bottom-2 flex items-center justify-center gap-2 px-3 opacity-90 sm:opacity-0 group-hover/img:opacity-100 transition duration-200 z-10">
+                <button type="button" 
+                        onclick="openLightbox(document.getElementById('dossier-portrait-img').src, '<?php echo html_escape(addslashes($entry->title)); ?>')" 
+                        class="px-2.5 py-1 bg-paper-ink/90 hover:bg-gold hover:text-paper-ink border border-gold text-gold font-mono text-[10px] uppercase font-bold tracking-wider transition shadow-ink-sm flex items-center gap-1">
+                  <span>⤢</span> ENLARGE
+                </button>
+                <button type="button" 
+                        onclick="document.getElementById('portrait-file-input').click()" 
+                        class="px-2.5 py-1 bg-paper-ink/90 hover:bg-copper hover:text-paper-ink border border-copper text-copper font-mono text-[10px] uppercase font-bold tracking-wider transition shadow-ink-sm flex items-center gap-1">
+                  <span>↻</span> CHANGE
+                </button>
+                <button type="button" 
+                        onclick="removeCoverPortrait(<?php echo $entry->id; ?>)" 
+                        class="px-2.5 py-1 bg-paper-ink/90 hover:bg-wax hover:text-white border border-wax text-wax-light font-mono text-[10px] uppercase font-bold tracking-wider transition shadow-ink-sm flex items-center gap-1"
+                        title="Remove portrait from dossier">
+                  <span>✕</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- B. PLACEHOLDER / DROPZONE (When NO portrait exists) -->
+            <div id="portrait-placeholder-wrapper" class="<?php echo $has_cover ? 'hidden' : ''; ?> flex flex-col items-center justify-center p-6 text-center w-full h-full">
+              <!-- Watermark Rune -->
+              <svg class="absolute inset-0 m-auto w-36 h-36 opacity-10 text-gold pointer-events-none" viewBox="0 0 100 100" fill="currentColor">
+                <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" fill="none" stroke="currentColor" stroke-width="2"/>
+                <circle cx="50" cy="50" r="28" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="50" y1="5" x2="50" y2="95" stroke="currentColor" stroke-width="1"/>
+                <line x1="10" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="1"/>
+              </svg>
+
+              <span class="font-display italic text-base text-copper mb-1">[No Illuminated Portrait]</span>
+              <p class="font-mono text-[10px] text-ash tracking-wider uppercase mb-3 max-w-[200px]">
+                Drop image here or click below to inscribe portrait
+              </p>
+
+              <button type="button" 
+                      onclick="document.getElementById('portrait-file-input').click()" 
+                      class="px-3.5 py-1.5 bg-paper-panel hover:bg-gold hover:text-paper-ink border-2 border-gold text-gold font-mono text-[10px] uppercase font-bold tracking-wider transition shadow-ink-sm flex items-center gap-1.5 z-10 cursor-pointer">
+                <span>＋</span> INSCRIBE PORTRAIT
+              </button>
+            </div>
+
+            <!-- C. UPLOAD SPINNER OVERLAY -->
+            <div id="portrait-uploading-overlay" class="hidden absolute inset-0 bg-paper-ink/90 flex flex-col items-center justify-center gap-2 z-30">
+              <div class="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
+              <span class="font-mono text-[10px] text-gold uppercase tracking-widest font-bold">
+                INSCRIBING PORTRAIT...
+              </span>
+            </div>
+
           </div>
+
+          <!-- HIDDEN FILE INPUT -->
+          <input type="file" 
+                 id="portrait-file-input" 
+                 accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" 
+                 class="hidden" 
+                 onchange="handlePortraitFileSelect(this)">
         </div>
 
         <!-- NAME & SUMMARY -->
@@ -507,4 +588,166 @@
       document.getElementById('inverse_label').value = parts[1];
     }
   }
+
+  // --- PORTRAIT DRAG & DROP AND AJAX UPLOAD ---
+  function handlePortraitDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = document.getElementById('portrait-dropzone');
+    if (dropzone) {
+      dropzone.classList.add('border-gold', 'bg-paper-panel');
+    }
+  }
+
+  function handlePortraitDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = document.getElementById('portrait-dropzone');
+    if (dropzone) {
+      dropzone.classList.remove('border-gold', 'bg-paper-panel');
+    }
+  }
+
+  function handlePortraitDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    handlePortraitDragLeave(e);
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      uploadPortraitFile(e.dataTransfer.files[0]);
+    }
+  }
+
+  function handlePortraitFileSelect(input) {
+    if (input.files && input.files.length > 0) {
+      uploadPortraitFile(input.files[0]);
+    }
+  }
+
+  function uploadPortraitFile(file) {
+    if (!file) return;
+
+    // Show spinner overlay
+    const overlay = document.getElementById('portrait-uploading-overlay');
+    if (overlay) overlay.classList.remove('hidden');
+
+    const formData = new FormData();
+    formData.append('portrait', file);
+    formData.append('entry_id', '<?php echo (int)$entry->id; ?>');
+    formData.append('is_cover', '1');
+
+    fetch('<?php echo base_url('media/upload'); ?>', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (overlay) overlay.classList.add('hidden');
+      if (data.success) {
+        // Update image src
+        const img = document.getElementById('dossier-portrait-img');
+        if (img) img.src = data.url;
+
+        // Unhide image wrapper, hide placeholder
+        const imgWrapper = document.getElementById('portrait-image-wrapper');
+        const placeholderWrapper = document.getElementById('portrait-placeholder-wrapper');
+        if (imgWrapper) imgWrapper.classList.remove('hidden');
+        if (placeholderWrapper) placeholderWrapper.classList.add('hidden');
+
+        showArchivalToast(data.message || 'Portrait inscribed into the Codex!');
+      } else {
+        alert('Upload Error: ' + (data.message || 'Failed to upload image'));
+      }
+    })
+    .catch(err => {
+      if (overlay) overlay.classList.add('hidden');
+      alert('Network or server error while uploading portrait.');
+      console.error(err);
+    });
+  }
+
+  function removeCoverPortrait(entryId) {
+    if (!confirm('Remove this illuminated portrait from the dossier?')) return;
+
+    const formData = new FormData();
+    formData.append('entry_id', entryId);
+
+    fetch('<?php echo base_url('media/remove_cover'); ?>', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const imgWrapper = document.getElementById('portrait-image-wrapper');
+        const placeholderWrapper = document.getElementById('portrait-placeholder-wrapper');
+        if (imgWrapper) imgWrapper.classList.add('hidden');
+        if (placeholderWrapper) placeholderWrapper.classList.remove('hidden');
+        showArchivalToast('Portrait removed from dossier.');
+      } else {
+        alert(data.message || 'Failed to remove portrait.');
+      }
+    })
+    .catch(err => {
+      alert('Network error while removing portrait.');
+      console.error(err);
+    });
+  }
+
+  // --- LIGHTBOX MODAL ---
+  function openLightbox(src, title) {
+    if (!src) return;
+    const modal = document.getElementById('portrait-lightbox-modal');
+    const img = document.getElementById('lightbox-img');
+    const titleEl = document.getElementById('lightbox-title');
+    if (img) img.src = src;
+    if (titleEl && title) titleEl.textContent = 'ILLUMINATION // ' + title.toUpperCase();
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+  }
+
+  function closeLightbox(e) {
+    const modal = document.getElementById('portrait-lightbox-modal');
+    if (modal) {
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeLightbox();
+    }
+  });
+
+  function showArchivalToast(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-5 right-5 z-50 bg-paper-ink border-2 border-gold shadow-ink p-3 font-mono text-xs text-gold flex items-center gap-2';
+    toast.innerHTML = '<span class="w-2 h-2 bg-gold rotate-45"></span><span>' + msg + '</span>';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 3500);
+  }
 </script>
+
+<!-- LIGHTBOX MODAL -->
+<div id="portrait-lightbox-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4" onclick="closeLightbox(event)">
+  <div class="relative max-w-4xl max-h-[90vh] bg-paper-ink border-2 border-gold shadow-ink p-2 flex flex-col" onclick="event.stopPropagation()">
+    <!-- Lightbox Titlebar -->
+    <div class="flex items-center justify-between border-b border-paper-line bg-paper-panel px-3 py-1.5 mb-2 font-mono text-xs">
+      <div class="flex items-center gap-2 text-gold">
+        <span class="w-2 h-2 bg-gold rotate-45"></span>
+        <span id="lightbox-title" class="font-bold tracking-wider uppercase">ARCHIVAL ILLUMINATION</span>
+      </div>
+      <button type="button" onclick="closeLightbox()" class="text-ash hover:text-gold text-xs font-mono uppercase font-bold px-2 py-0.5 border border-paper-line bg-paper-base transition">
+        ✕ CLOSE [ESC]
+      </button>
+    </div>
+    <!-- Full Image Container -->
+    <div class="overflow-auto flex items-center justify-center max-h-[80vh] p-2 bg-paper-deep">
+      <img id="lightbox-img" src="" alt="Enlarged Portrait" class="max-w-full max-h-[76vh] object-contain border border-paper-line/50 shadow-ink-sm">
+    </div>
+  </div>
+</div>

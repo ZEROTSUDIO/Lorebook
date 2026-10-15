@@ -112,12 +112,32 @@
             </div>
 
             <!-- 5. PORTRAIT / COVER IMAGE -->
-            <div class="flex flex-col gap-1.5 font-mono text-xs border-t border-paper-line pt-4">
+            <div class="flex flex-col gap-2 font-mono text-xs border-t border-paper-line pt-4">
               <label for="cover_image" class="text-ash uppercase text-[11px] flex items-center justify-between">
                 <span>PORTRAIT / COVER ART PLATE</span>
-                <span class="text-[10px] text-ash/70">[FILENAME/URL]</span>
+                <span class="text-[10px] text-copper">[LOCAL/URL]</span>
               </label>
-              <input type="text" name="cover_image" id="cover_image" value="<?php echo set_value('cover_image', $entry->cover_image); ?>" placeholder="e.g. ILSABET_VOSS_PORTRAIT.WEBP" class="w-full bg-paper-base border border-paper-line focus:border-gold px-2.5 py-1.5 text-parchment text-xs outline-none transition placeholder:text-ash/40">
+
+              <!-- Live Preview Container -->
+              <div id="cover-preview-box" class="relative border-2 border-paper-line bg-paper-deep p-2 flex items-center gap-3 shadow-ink-sm">
+                <div class="w-16 h-16 bg-paper-base border border-paper-line/80 flex items-center justify-center overflow-hidden shrink-0">
+                  <img id="cover-preview-img" src="<?php echo !empty($entry->cover_image) ? (strpos($entry->cover_image, 'http') === 0 ? html_escape($entry->cover_image) : base_url(html_escape($entry->cover_image))) : ''; ?>" alt="Preview" class="<?php echo !empty($entry->cover_image) ? '' : 'hidden'; ?> w-full h-full object-cover">
+                  <span id="cover-preview-placeholder" class="<?php echo !empty($entry->cover_image) ? 'hidden' : ''; ?> text-ash text-xl font-bold font-mono">✦</span>
+                </div>
+                <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+                  <input type="text" name="cover_image" id="cover_image" value="<?php echo set_value('cover_image', $entry->cover_image); ?>" oninput="updateCoverPreview(this.value)" placeholder="e.g. storage/media/portrait.png or URL" class="w-full bg-paper-base border border-paper-line focus:border-gold px-2.5 py-1 text-parchment text-xs outline-none transition placeholder:text-ash/40">
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="document.getElementById('edit-cover-file-input').click()" class="px-2 py-0.5 border border-gold bg-paper-panel hover:bg-gold hover:text-paper-ink text-gold text-[10px] uppercase font-bold tracking-wider transition">
+                      ↑ UPLOAD FILE
+                    </button>
+                    <button type="button" onclick="clearCoverImage()" class="text-ash hover:text-wax text-[10px] uppercase transition">
+                      CLEAR
+                    </button>
+                    <span id="cover-upload-status" class="text-gold text-[10px] hidden font-mono animate-pulse">UPLOADING...</span>
+                  </div>
+                </div>
+              </div>
+              <input type="file" id="edit-cover-file-input" accept="image/*" class="hidden" onchange="uploadEditCover(this)">
             </div>
 
             <!-- 6. DYNAMIC STRUCTURED ATTRIBUTES PER ENTRY TYPE -->
@@ -387,5 +407,62 @@ function toggleEditorTab(mode) {
     toolbar.classList.remove('opacity-40', 'pointer-events-none');
     getEditor().focus();
   }
+}
+
+function updateCoverPreview(val) {
+  const img = document.getElementById('cover-preview-img');
+  const placeholder = document.getElementById('cover-preview-placeholder');
+  if (!val || val.trim() === '') {
+    img.src = '';
+    img.classList.add('hidden');
+    placeholder.classList.remove('hidden');
+    return;
+  }
+  let src = val.trim();
+  if (!src.startsWith('http://') && !src.startsWith('https://')) {
+    src = '<?php echo base_url(); ?>' + src;
+  }
+  img.src = src;
+  img.classList.remove('hidden');
+  placeholder.classList.add('hidden');
+}
+
+function clearCoverImage() {
+  document.getElementById('cover_image').value = '';
+  updateCoverPreview('');
+}
+
+function uploadEditCover(input) {
+  if (!input.files || input.files.length === 0) return;
+  const file = input.files[0];
+  const status = document.getElementById('cover-upload-status');
+  if (status) status.classList.remove('hidden');
+
+  const formData = new FormData();
+  formData.append('portrait', file);
+  formData.append('world_id', '<?php echo (int)$active_world->id; ?>');
+  <?php if (isset($entry->id)): ?>
+  formData.append('entry_id', '<?php echo (int)$entry->id; ?>');
+  <?php endif; ?>
+
+  fetch('<?php echo base_url('media/upload'); ?>', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (status) status.classList.add('hidden');
+    if (data.success) {
+      document.getElementById('cover_image').value = data.file_path;
+      updateCoverPreview(data.file_path);
+    } else {
+      alert(data.message || 'Upload failed');
+    }
+  })
+  .catch(err => {
+    if (status) status.classList.add('hidden');
+    alert('Upload error.');
+    console.error(err);
+  });
 }
 </script>
