@@ -2,9 +2,17 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Lorekeeper Markdown & Wiki Link Parser Engine
- * Converts Markdown prose into Field Archivist Grimoire typography
- * and automatically resolves [[Wiki Links]] to lore entries or uncreated concepts.
+ * ============================================================================
+ * LOREKEEPER // GRIMOIRE MARKDOWN & ILLUMINATION PARSER
+ * ============================================================================
+ * 
+ * Converts raw Markdown prose into Field Archivist Grimoire typography.
+ * Supports:
+ * 1. Illuminated Figures & Plates: ![Caption](path_or_url)
+ * 2. Automatic [[Wiki Links]] resolution with live backlinks & redlink discovery
+ * 3. Standard Markdown hyperlinks: [Label](url)
+ * 4. Classical Drop-caps, ornamental dividers, and blockquotes
+ * 5. Code blocks & inline syntax masking
  */
 class Markdown_parser {
 
@@ -17,7 +25,7 @@ class Markdown_parser {
     }
 
     /**
-     * Parses markdown text and resolves [[Wiki Links]] for a specific world
+     * Parses markdown text, resolves images and [[Wiki Links]] for a specific world
      *
      * @param string $text Raw markdown content
      * @param int $world_id Active world ID
@@ -55,10 +63,51 @@ class Markdown_parser {
             return $key;
         }, $text);
 
-        // 4. Resolve [[Wiki Links]]
+        // 4. Extract and format Illuminated Figures / Images: ![Caption](path_or_url)
+        $figures = array();
+        $fig_counter = 1;
+        $text = preg_replace_callback('/!\[([^\]]*)\]\(([^)]+)\)/', function($matches) use (&$figures, &$fig_counter, $world_id) {
+            $key = '%%FIGURE_' . count($figures) . '%%';
+            $raw_caption = trim($matches[1]);
+            $raw_path    = trim($matches[2]);
+
+            $caption = !empty($raw_caption) ? htmlspecialchars($raw_caption, ENT_QUOTES, 'UTF-8') : 'Illuminated Manuscript Plate';
+            $resolved_url = $this->resolve_image_url($raw_path, $world_id);
+            $roman = $this->to_roman($fig_counter++);
+
+            $figure_html = '<figure class="my-6 border-2 border-paper-line bg-paper-ink p-2 sm:p-3 shadow-ink-sm corner-brackets group relative">'
+                . '<span class="absolute top-1 left-1 text-[10px] font-mono text-gold/60 pointer-events-none">+</span>'
+                . '<span class="absolute top-1 right-1 text-[10px] font-mono text-gold/60 pointer-events-none">+</span>'
+                . '<span class="absolute bottom-1 left-1 text-[10px] font-mono text-gold/60 pointer-events-none">+</span>'
+                . '<span class="absolute bottom-1 right-1 text-[10px] font-mono text-gold/60 pointer-events-none">+</span>'
+                . '<div class="overflow-hidden bg-paper-deep border border-paper-line/70 flex items-center justify-center relative cursor-pointer" onclick="if(typeof openLightbox===\'function\') openLightbox(\'' . htmlspecialchars($resolved_url, ENT_QUOTES, 'UTF-8') . '\', \'' . addslashes($caption) . '\')">'
+                . '<img src="' . htmlspecialchars($resolved_url, ENT_QUOTES, 'UTF-8') . '" alt="' . $caption . '" class="w-full max-h-[520px] object-contain transition duration-500 group-hover:scale-[1.01]">'
+                . '<div class="absolute bottom-2 right-2 bg-paper-ink/85 border border-gold/60 text-gold px-2 py-0.5 text-[9px] font-mono uppercase opacity-0 group-hover:opacity-100 transition shadow-ink-sm flex items-center gap-1"><span>⤢</span> ENLARGE</div>'
+                . '</div>'
+                . '<figcaption class="mt-2.5 pt-2 border-t border-paper-line/50 flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono gap-1">'
+                . '<div class="flex items-center gap-2 text-copper font-bold text-[10px] uppercase tracking-widest">'
+                . '<span class="w-1.5 h-1.5 bg-copper rotate-45 inline-block"></span>'
+                . '<span>PLATE ' . $roman . '</span>'
+                . '</div>'
+                . '<span class="font-newsreader italic text-parchment-dim text-sm text-right">' . $caption . '</span>'
+                . '</figcaption>'
+                . '</figure>';
+
+            $figures[$key] = $figure_html;
+            return "\n\n" . $key . "\n\n";
+        }, $text);
+
+        // 5. Resolve [[Wiki Links]]
         $text = $this->resolve_wiki_links($text, $world_id);
 
-        // 5. Headings
+        // 6. Resolve standard Markdown links: [Label](url)
+        $text = preg_replace_callback('/(?<!!)\[([^\]]+)\]\(([^)]+)\)/', function($matches) {
+            $label = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
+            $url   = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
+            return '<a href="' . $url . '" target="_blank" rel="noopener noreferrer" class="text-gold hover:text-gold-light border-b border-gold/50 font-medium transition hover:bg-gold/10 px-0.5" title="' . $label . '">' . $label . ' <span class="text-[9px] text-copper">↗</span></a>';
+        }, $text);
+
+        // 7. Headings
         $text = preg_replace_callback('/^(#{1,6})\s+(.+)$/m', function($matches) {
             $level = strlen($matches[1]);
             $title = trim($matches[2]);
@@ -73,7 +122,7 @@ class Markdown_parser {
             }
         }, $text);
 
-        // 6. Blockquotes
+        // 8. Blockquotes
         $text = preg_replace_callback('/(?:^>.*(?:\n|$))+/m', function($matches) {
             $lines = explode("\n", trim($matches[0]));
             $content = array();
@@ -84,17 +133,17 @@ class Markdown_parser {
             return '<blockquote class="my-5 p-4 sm:p-5 bg-paper-deep border-l-4 border-gold shadow-ink-sm font-prose italic text-lg sm:text-xl text-parchment-dim leading-relaxed relative"><span class="font-display text-4xl text-gold/30 absolute top-1 left-2 select-none">“</span><div class="relative z-10 pl-3">' . nl2br($quote_text) . '</div></blockquote>';
         }, $text);
 
-        // 7. Horizontal Rules
+        // 9. Horizontal Rules
         $text = preg_replace('/^(\-{3,}|\*{3,}|_{3,})$/m', '<div class="my-8 flex items-center gap-3"><span class="flex-1 h-px bg-paper-line"></span><span class="w-2 h-2 border border-gold rotate-45"></span><span class="w-3 h-3 border border-copper rotate-45 flex items-center justify-center"><span class="w-1 h-1 bg-gold"></span></span><span class="w-2 h-2 border border-gold rotate-45"></span><span class="flex-1 h-px bg-paper-line"></span></div>', $text);
 
-        // 8. Bold and Italic formatting
+        // 10. Bold and Italic formatting
         $text = preg_replace('/\*\*\*(.+?)\*\*\*/s', '<strong class="font-bold text-gold"><em>$1</em></strong>', $text);
         $text = preg_replace('/\*\*(.+?)\*\*/s', '<strong class="font-bold text-gold">$1</strong>', $text);
         $text = preg_replace('/__(.+?)__/s', '<strong class="font-bold text-gold">$1</strong>', $text);
         $text = preg_replace('/\*([^\*\n]+)\*/', '<em class="italic text-parchment-dim">$1</em>', $text);
         $text = preg_replace('/_([^_\n]+)_/', '<em class="italic text-parchment-dim">$1</em>', $text);
 
-        // 9. Unordered Lists
+        // 11. Unordered Lists
         $text = preg_replace_callback('/(?:^[\*\-]\s+.+(?:\n|$))+/m', function($matches) {
             $lines = explode("\n", trim($matches[0]));
             $items = array();
@@ -107,7 +156,7 @@ class Markdown_parser {
             return '<ul class="my-4 pl-2 font-prose text-base space-y-1">' . implode('', $items) . '</ul>';
         }, $text);
 
-        // 10. Ordered Lists
+        // 12. Ordered Lists
         $text = preg_replace_callback('/(?:^\d+\.\s+.+(?:\n|$))+/m', function($matches) {
             $lines = explode("\n", trim($matches[0]));
             $items = array();
@@ -121,7 +170,7 @@ class Markdown_parser {
             return '<ol class="my-4 pl-2 font-prose text-base space-y-1">' . implode('', $items) . '</ol>';
         }, $text);
 
-        // 11. Paragraphs (blocks separated by blank lines)
+        // 13. Paragraphs (blocks separated by blank lines)
         $blocks = preg_split('/\n{2,}/', $text);
         $html_blocks = array();
 
@@ -130,7 +179,7 @@ class Markdown_parser {
             if (empty($block)) continue;
 
             // If block is already wrapped in HTML or a placeholder tag, don't wrap in <p>
-            if (preg_match('/^<(h[1-6]|blockquote|ul|ol|pre|div|table)/i', $block) || preg_match('/^%%CODEBLOCK_\d+%%$/', $block)) {
+            if (preg_match('/^<(h[1-6]|blockquote|ul|ol|pre|div|table|figure)/i', $block) || preg_match('/^%%(CODEBLOCK|FIGURE)_\d+%%$/', $block)) {
                 $html_blocks[] = $block;
             } else {
                 $html_blocks[] = '<p class="font-prose text-base sm:text-lg text-parchment leading-relaxed mb-4">' . nl2br($block) . '</p>';
@@ -139,12 +188,17 @@ class Markdown_parser {
 
         $result = implode("\n\n", $html_blocks);
 
-        // 12. Restore inline code
+        // 14. Restore figures
+        foreach ($figures as $key => $val) {
+            $result = str_replace($key, $val, $result);
+        }
+
+        // 15. Restore inline code
         foreach ($inline_codes as $key => $val) {
             $result = str_replace($key, $val, $result);
         }
 
-        // 13. Restore code blocks
+        // 16. Restore code blocks
         foreach ($code_blocks as $key => $val) {
             $result = str_replace($key, $val, $result);
         }
@@ -190,6 +244,66 @@ class Markdown_parser {
                 return '<a href="' . $create_url . '" class="wiki-link-unwritten inline-flex items-center gap-1 text-copper hover:text-parchment border-b border-dashed border-copper/70 font-mono text-sm px-1 py-0.5 bg-paper-deep/60 hover:bg-copper/10 transition" title="Unrecorded lore concept — Click to inscribe new entry"><span class="text-[10px] text-copper">✧</span>' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . ' <span class="text-[10px] text-copper font-bold" style="font-size: 10px;">[＋]</span></a>';
             }
         }, $text);
+    }
+
+    /**
+     * Resolves local filenames, relative paths, or external URLs into accessible web URLs
+     */
+    protected function resolve_image_url($raw_path, $world_id)
+    {
+        // 1. External or data URL
+        if (preg_match('/^(https?:\/\/|data:image\/)/i', $raw_path)) {
+            return $raw_path;
+        }
+
+        $clean_path = ltrim($raw_path, '/\\');
+
+        // 2. Direct storage or asset path
+        if (strpos($clean_path, 'storage/') === 0 || strpos($clean_path, 'assets/') === 0) {
+            return base_url($clean_path);
+        }
+
+        // 3. Physical check in storage/media/
+        if (file_exists(FCPATH . 'storage/media/' . $clean_path)) {
+            return base_url('storage/media/' . $clean_path);
+        }
+
+        // 4. Query media_attachments by stored_filename or original_filename
+        $this->CI->db->select('file_path');
+        $this->CI->db->from('media_attachments');
+        $this->CI->db->where('world_id', $world_id);
+        $this->CI->db->group_start();
+        $this->CI->db->where('stored_filename', $clean_path);
+        $this->CI->db->or_where('original_filename', $clean_path);
+        $this->CI->db->group_end();
+        $media = $this->CI->db->get()->row();
+
+        if ($media && !empty($media->file_path)) {
+            return base_url($media->file_path);
+        }
+
+        // 5. Default fallback to storage/media/
+        return base_url('storage/media/' . $clean_path);
+    }
+
+    /**
+     * Converts integer to classical Roman numerals (1 -> I, 2 -> II, etc.)
+     */
+    private function to_roman($num)
+    {
+        $n = intval($num);
+        $result = '';
+        $lookup = array(
+            'M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400,
+            'C' => 100,  'XC' => 90,  'L' => 50,  'XL' => 40,
+            'X' => 10,   'IX' => 9,   'V' => 5,   'IV' => 4, 'I' => 1
+        );
+        foreach ($lookup as $roman => $value) {
+            $matches = intval($n / $value);
+            $result .= str_repeat($roman, $matches);
+            $n = $n % $value;
+        }
+        return $result ?: 'I';
     }
 
     /**
