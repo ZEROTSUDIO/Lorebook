@@ -223,14 +223,14 @@ lorekeeper/
 - [x] Seed Vault Browser & Idempotent Runner UI (`/seed` via `application/controllers/Seed.php` and `application/views/seed/index.php`).
 - [ ] Dedicated Chronological Timeline Hub (`/timeline` or `/entries/chronology`) with era grouping and filtering.
 
-### Milestone 4: Media Vault & Attachments (In Progress)
+### Milestone 4: Media Vault & Attachments (Complete)
 - [x] Secure local image upload system (`media_attachments`) with collision-resistant hashed filenames, MIME validation, and metadata tracking (`Media.php`).
 - [x] Drag-and-drop dropzone, live AJAX upload, change, remove, and full-screen Lightbox modal for dossier portraits in `entries/view.php`.
 - [x] Live portrait preview and instant upload buttons in `entries/create.php` and `entries/edit.php`.
 - [x] Grimoire Markdown Image Parser (`![Caption](url/path)`) with illuminated figure styling, plate numbering (`PLATE I`, `PLATE II`), automatic local media resolution, and captions (`Markdown_parser.php`).
 - [x] Dropzone / File picker for world cartography plates and architectural engravings in Compendium Settings (`dashboard/settings.php` & `dashboard/index.php`).
 - [x] Editor Image Inscriber with Clipboard Paste (`Ctrl + V`), Drag-and-Drop file dropzone, toolbar `+Plate` uploader, live inscription status banner, and global Lightbox integration (`editor_inscriber_js.php`).
-- [ ] Entry Concept Art Folio & Gallery Drawer (multiple supporting sketches & attachments per entry).
+- [x] Entry Concept Art Folio & Gallery Drawer (multiple supporting sketches, turnaround orthographics & attachments per entry in `entries/view.php`).
 
 ### Milestone 5: Backup, Portability & Future Expansion
 - [ ] Complete ZIP export package (`manifest.json`, structured data, Markdown, and media).

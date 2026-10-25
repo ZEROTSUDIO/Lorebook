@@ -395,6 +395,18 @@ class Entries extends CI_Controller {
                                   ->order_by('entries.title', 'ASC')
                                   ->get()->result();
 
+        // 6. Fetch Supporting Media Attachments (Concept Art Folio)
+        $this->db->select('*');
+        $this->db->from('media_attachments');
+        $this->db->where('entry_id', $id);
+        $this->db->order_by('id', 'DESC');
+        $attachments = $this->db->get()->result();
+
+        foreach ($attachments as $att) {
+            $att->url = (strpos($att->file_path, 'http') === 0) ? $att->file_path : base_url($att->file_path);
+            $att->formatted_size = $this->format_bytes($att->file_size);
+        }
+
         $user_id = $this->session->userdata('user_id');
         $current_user = $user_id ? $this->db->get_where('users', array('id' => $user_id))->row() : $this->db->get('users')->row();
 
@@ -414,6 +426,7 @@ class Entries extends CI_Controller {
             'outbound_relationships' => $outbound_relationships,
             'inbound_relationships'  => $inbound_relationships,
             'other_entries'          => $other_entries,
+            'attachments'            => $attachments,
             'content_view'           => 'entries/view',
         );
 
@@ -797,5 +810,15 @@ class Entries extends CI_Controller {
             mt_rand(0, 0x3fff) | 0x8000,
             mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
+    }
+
+    private function format_bytes($bytes, $precision = 1)
+    {
+        $units = array('B', 'KB', 'MB', 'GB');
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }

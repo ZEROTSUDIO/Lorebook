@@ -151,6 +151,14 @@
 
           </div>
 
+          <?php if (!empty($attachments)): ?>
+            <!-- Quick Link to Concept Art Folio -->
+            <a href="#concept-art-folio" class="w-full mt-2 py-1 px-2.5 border border-paper-line hover:border-gold bg-paper-deep text-[10px] font-mono text-copper hover:text-gold flex items-center justify-between transition shadow-ink-sm">
+              <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-copper rotate-45 inline-block"></span> CONCEPT ART FOLIO</span>
+              <span class="text-gold font-bold">[<?php echo count($attachments); ?> <?php echo count($attachments) === 1 ? 'PLATE' : 'PLATES'; ?> &darr;]</span>
+            </a>
+          <?php endif; ?>
+
           <!-- HIDDEN FILE INPUT -->
           <input type="file" 
                  id="portrait-file-input" 
@@ -326,6 +334,118 @@
       </div>
 
     </article>
+
+    <!-- ================================================================= -->
+    <!-- CONCEPT ART FOLIO & SUPPORTING ATTACHMENTS (GALLERY DRAWER)       -->
+    <!-- ================================================================= -->
+    <section id="concept-art-folio" class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
+      <!-- Flush Grimoire Title Bar -->
+      <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-gold rotate-45"></span>
+          <span class="text-gold font-bold tracking-widest uppercase">CONCEPT ART FOLIO // SUPPORTING ILLUMINATIONS</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-ash text-[10px]" id="folio-count-badge">
+            <?php echo count($attachments); ?> <?php echo count($attachments) === 1 ? 'ATTACHMENT' : 'ATTACHMENTS'; ?>
+          </span>
+          <button type="button" onclick="document.getElementById('folio-upload-input').click()" class="border border-gold text-gold hover:bg-gold hover:text-paper-ink px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition flex items-center gap-1 shadow-ink-sm">
+            <span>＋</span> INSCRIBE ATTACHMENT
+          </button>
+        </div>
+      </div>
+
+      <div class="p-5 flex flex-col gap-5">
+        
+        <!-- Live Uploading Progress Banner -->
+        <div id="folio-upload-status" class="hidden font-mono text-xs text-gold bg-paper-ink border border-gold/60 p-2.5 shadow-ink-sm flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 border-2 border-gold border-t-transparent animate-spin inline-block"></span>
+            <span id="folio-upload-status-text" class="font-bold tracking-wider">INSCRIBING ILLUMINATION INTO FOLIO...</span>
+          </div>
+          <span class="text-[10px] text-ash">RECORDING TO VAULT</span>
+        </div>
+
+        <!-- Hidden File Input for Folio Uploader -->
+        <input type="file" id="folio-upload-input" accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif" class="hidden" onchange="handleFolioFileSelect(this)">
+
+        <!-- Drag & Drop Zone Area -->
+        <div id="folio-dropzone-area" class="border-2 border-dashed border-paper-line/70 hover:border-gold p-4 bg-paper-deep/50 text-center transition cursor-pointer group" onclick="document.getElementById('folio-upload-input').click()">
+          <div class="flex flex-col items-center justify-center gap-1">
+            <div class="flex items-center gap-2 text-gold text-xs font-mono font-bold uppercase tracking-wider group-hover:translate-y-[-1px] transition">
+              <span>🖼</span> DRAG &amp; DROP CONCEPT ART, ORTHOGRAPHICS, OR MAPS HERE
+            </div>
+            <p class="font-mono text-[10px] text-ash">
+              Supports PNG, JPG, WEBP, SVG up to 15MB · Inscribed into <code class="text-gold font-mono">media_attachments</code>
+            </p>
+          </div>
+        </div>
+
+        <!-- Gallery Grid -->
+        <div id="folio-gallery-grid" class="<?php echo empty($attachments) ? 'hidden' : ''; ?> grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <?php if (!empty($attachments)): ?>
+            <?php foreach ($attachments as $att): ?>
+              <?php 
+                $is_cover = ($att->id == $entry->cover_media_id || $att->file_path == $entry->cover_image); 
+              ?>
+              <div id="folio-card-<?php echo $att->id; ?>" class="bg-paper-base border-2 border-paper-line hover:border-gold p-2 shadow-ink-sm corner-brackets group flex flex-col justify-between transition relative overflow-hidden">
+                <span class="absolute top-1 left-1 text-[9px] font-mono text-gold/60 pointer-events-none">+</span>
+                <span class="absolute top-1 right-1 text-[9px] font-mono text-gold/60 pointer-events-none">+</span>
+                <span class="absolute bottom-1 left-1 text-[9px] font-mono text-gold/60 pointer-events-none">+</span>
+                <span class="absolute bottom-1 right-1 text-[9px] font-mono text-gold/60 pointer-events-none">+</span>
+
+                <!-- Image Viewport with Hover Zoom & Full-Res Lightbox Click -->
+                <div class="h-36 sm:h-40 bg-paper-deep border border-paper-line/60 flex items-center justify-center overflow-hidden relative cursor-pointer" onclick="openLightbox('<?php echo html_escape($att->url); ?>', '<?php echo html_escape($att->caption ? $att->caption : $att->original_filename); ?>')">
+                  <img src="<?php echo html_escape($att->url); ?>" alt="<?php echo html_escape($att->caption); ?>" class="w-full h-full object-contain transition duration-500 group-hover:scale-[1.03]">
+
+                  <!-- Cover Stamp Badge -->
+                  <span id="folio-cover-badge-<?php echo $att->id; ?>" class="folio-cover-badge absolute top-1.5 left-1.5 bg-gold text-paper-ink font-mono text-[9px] font-bold px-1.5 py-0.5 shadow-ink-sm uppercase <?php echo $is_cover ? '' : 'hidden'; ?>">
+                    ★ COVER
+                  </span>
+
+                  <!-- Enlarge Badge on Hover -->
+                  <div class="absolute bottom-1.5 right-1.5 bg-paper-ink/85 border border-gold/60 text-gold px-1.5 py-0.5 text-[8px] font-mono uppercase opacity-0 group-hover:opacity-100 transition shadow-ink-sm flex items-center gap-1">
+                    <span>⤢</span> ENLARGE
+                  </div>
+                </div>
+
+                <!-- Caption Strip & Metadata -->
+                <div class="pt-2 pb-1 border-b border-paper-line/50 flex flex-col gap-0.5">
+                  <span class="font-newsreader italic text-xs text-parchment truncate" title="<?php echo html_escape($att->caption ? $att->caption : $att->original_filename); ?>">
+                    <?php echo html_escape($att->caption ? $att->caption : $att->original_filename); ?>
+                  </span>
+                  <div class="flex items-center justify-between font-mono text-[9px] text-ash">
+                    <span><?php echo html_escape($att->formatted_size); ?></span>
+                    <span><?php echo date('M d, Y', strtotime($att->created_at)); ?></span>
+                  </div>
+                </div>
+
+                <!-- Hover Quick Actions Toolbar -->
+                <div class="pt-1.5 flex items-center justify-between font-mono text-[9px] gap-1">
+                  <button type="button" onclick="setFolioAsCover(<?php echo $att->id; ?>, '<?php echo html_escape($att->file_path); ?>')" title="Set as main dossier cover portrait" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-panel text-ash hover:text-gold transition uppercase">
+                    ★ Set Cover
+                  </button>
+                  <button type="button" onclick="copyFolioMarkdownTag('<?php echo html_escape($att->caption ? $att->caption : 'Plate'); ?>', '<?php echo html_escape($att->file_path); ?>')" title="Copy Markdown Tag for article prose" class="border border-paper-line hover:border-copper px-1.5 py-0.5 bg-paper-panel text-ash hover:text-copper transition uppercase">
+                    📋 Copy Tag
+                  </button>
+                  <button type="button" onclick="deleteFolioAttachment(<?php echo $att->id; ?>)" title="Excise from Folio" class="border border-paper-line hover:border-crimson px-1.5 py-0.5 bg-paper-panel text-ash hover:text-crimson transition uppercase">
+                    ✕
+                  </button>
+                </div>
+
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </div>
+
+        <!-- Empty State Prompt (if no attachments yet) -->
+        <div id="folio-empty-state" class="<?php echo !empty($attachments) ? 'hidden' : ''; ?> text-center py-6 border border-dashed border-paper-line/50 bg-paper-base/50">
+          <p class="font-prose italic text-sm text-ash mb-2">No supporting concept sketches, turnaround orthographics, or close-up plates inscribed yet.</p>
+          <span class="font-mono text-[10px] text-copper uppercase">Use the dropzone above or click "Inscribe Attachment" to build the visual folio.</span>
+        </div>
+
+      </div>
+    </section>
 
     <!-- ================================================================= -->
     <!-- SWORN BONDS & TIES // DIRECTED RELATIONSHIP MATRIX                -->
@@ -682,6 +802,10 @@
         const placeholderWrapper = document.getElementById('portrait-placeholder-wrapper');
         if (imgWrapper) imgWrapper.classList.add('hidden');
         if (placeholderWrapper) placeholderWrapper.classList.remove('hidden');
+
+        // Also remove cover badge in folio if present
+        document.querySelectorAll('.folio-cover-badge').forEach(b => b.classList.add('hidden'));
+
         showArchivalToast('Portrait removed from dossier.');
       } else {
         alert(data.message || 'Failed to remove portrait.');
@@ -692,5 +816,163 @@
       console.error(err);
     });
   }
+
+  // --- CONCEPT ART FOLIO & SUPPORTING GALLERY HANDLERS ---
+  function handleFolioFileSelect(input) {
+    if (input.files && input.files.length > 0) {
+      uploadFolioFile(input.files[0]);
+    }
+  }
+
+  function uploadFolioFile(file) {
+    if (!file || !file.type.startsWith('image/')) {
+      alert('Please select a valid image file (PNG, JPG, WEBP, SVG).');
+      return;
+    }
+
+    const statusBox = document.getElementById('folio-upload-status');
+    const statusText = document.getElementById('folio-upload-status-text');
+    if (statusBox) statusBox.classList.remove('hidden');
+    if (statusText) statusText.textContent = 'INSCRIBING [' + file.name.toUpperCase() + '] INTO FOLIO...';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('entry_id', '<?php echo (int)$entry->id; ?>');
+    formData.append('world_id', '<?php echo (int)$active_world->id; ?>');
+    formData.append('caption', file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' '));
+
+    fetch('<?php echo base_url("media/upload"); ?>', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (statusBox) statusBox.classList.add('hidden');
+      if (data.success) {
+        showArchivalToast('✦ Illumination inscribed into Folio: ' + (data.caption || 'New Plate'));
+        setTimeout(() => {
+          window.location.reload();
+        }, 600);
+      } else {
+        alert('Upload Error: ' + (data.message || 'Failed to inscribe file'));
+      }
+    })
+    .catch(err => {
+      if (statusBox) statusBox.classList.add('hidden');
+      alert('Network or server error during folio inscription.');
+      console.error(err);
+    });
+  }
+
+  function setFolioAsCover(mediaId, filePath) {
+    const formData = new FormData();
+    formData.append('entry_id', '<?php echo (int)$entry->id; ?>');
+    formData.append('media_id', mediaId);
+    formData.append('file_path', filePath);
+
+    fetch('<?php echo base_url("media/set_cover"); ?>', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // Update main portrait on sidebar
+        const img = document.getElementById('dossier-portrait-img');
+        if (img) img.src = data.url;
+
+        const imgWrapper = document.getElementById('portrait-image-wrapper');
+        const placeholderWrapper = document.getElementById('portrait-placeholder-wrapper');
+        if (imgWrapper) imgWrapper.classList.remove('hidden');
+        if (placeholderWrapper) placeholderWrapper.classList.add('hidden');
+
+        // Update cover badges in gallery
+        document.querySelectorAll('.folio-cover-badge').forEach(b => b.classList.add('hidden'));
+        const badge = document.getElementById('folio-cover-badge-' + mediaId);
+        if (badge) badge.classList.remove('hidden');
+
+        showArchivalToast('✦ Primary dossier portrait updated.');
+      } else {
+        alert(data.message || 'Failed to set cover.');
+      }
+    })
+    .catch(err => {
+      alert('Network error while setting cover.');
+      console.error(err);
+    });
+  }
+
+  function copyFolioMarkdownTag(caption, filePath) {
+    const tag = '![' + caption + '](' + filePath + ')';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tag).then(() => {
+        showArchivalToast('📋 Copied Markdown Tag: ' + tag);
+      }).catch(() => {
+        prompt('Copy Markdown Plate Tag:', tag);
+      });
+    } else {
+      prompt('Copy Markdown Plate Tag:', tag);
+    }
+  }
+
+  function deleteFolioAttachment(mediaId) {
+    if (!confirm('Are you sure you want to permanently excise this illumination from the Vault?')) return;
+
+    fetch('<?php echo base_url("media/delete/"); ?>' + mediaId, {
+      method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        const card = document.getElementById('folio-card-' + mediaId);
+        if (card) card.remove();
+
+        // Check if gallery is now empty
+        const grid = document.getElementById('folio-gallery-grid');
+        const remainingCards = grid ? grid.querySelectorAll('[id^="folio-card-"]').length : 0;
+        const badge = document.getElementById('folio-count-badge');
+        if (badge) badge.textContent = remainingCards + (remainingCards === 1 ? ' ATTACHMENT' : ' ATTACHMENTS');
+
+        if (remainingCards === 0) {
+          if (grid) grid.classList.add('hidden');
+          const empty = document.getElementById('folio-empty-state');
+          if (empty) empty.classList.remove('hidden');
+        }
+
+        showArchivalToast('✦ Illumination excised from Folio.');
+      } else {
+        alert(data.message || 'Failed to excise media attachment.');
+      }
+    })
+    .catch(err => {
+      alert('Network error while excising attachment.');
+      console.error(err);
+    });
+  }
+
+  // Setup Drag & Drop on Folio Dropzone Area
+  document.addEventListener('DOMContentLoaded', function() {
+    const dropzone = document.getElementById('folio-dropzone-area');
+    if (!dropzone) return;
+
+    dropzone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'copy';
+      dropzone.classList.add('border-gold', 'bg-paper-deep/80', 'ring-2', 'ring-gold/40');
+    });
+
+    dropzone.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      dropzone.classList.remove('border-gold', 'bg-paper-deep/80', 'ring-2', 'ring-gold/40');
+    });
+
+    dropzone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropzone.classList.remove('border-gold', 'bg-paper-deep/80', 'ring-2', 'ring-gold/40');
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        uploadFolioFile(e.dataTransfer.files[0]);
+      }
+    });
+  });
 
 </script>
