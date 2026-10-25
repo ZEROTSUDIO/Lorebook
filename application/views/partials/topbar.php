@@ -10,14 +10,14 @@
     <div class="relative group">
       <button type="button" class="flex items-center gap-1.5 font-bold tracking-widest uppercase text-parchment hover:text-gold border border-paper-line hover:border-gold px-2.5 py-1 bg-paper-panel transition text-xs shadow-ink-sm">
         <span class="w-1.5 h-1.5 bg-copper rotate-45 inline-block"></span>
-        <span>REALM: <?php echo isset($active_world) ? html_escape(strtoupper($active_world->name)) : 'CANAAN'; ?></span>
+        <span>World: <?php echo isset($active_world) ? html_escape(strtoupper($active_world->name)) : 'CANAAN'; ?></span>
         <span class="text-[9px] text-copper">▼</span>
       </button>
 
       <!-- DROPDOWN FOLIO -->
       <div class="absolute left-0 top-full mt-1.5 w-64 bg-paper-panel border-2 border-gold shadow-ink hidden group-hover:block z-50 p-2">
         <div class="font-mono text-[10px] text-copper uppercase tracking-wider px-2 py-1 border-b border-paper-line mb-1 flex justify-between">
-          <span>SWITCH SOVEREIGN REALM</span>
+          <span>Switch World</span>
           <span>CODEX</span>
         </div>
         
@@ -34,7 +34,7 @@
             >
               <span><?php echo html_escape($rw->name); ?></span>
               <?php if ((int)$rw->id === $cur_wid): ?>
-                <span class="text-[9px] text-gold">● ACTIVE</span>
+                <span class="text-[9px] text-gold">● Active</span>
               <?php endif; ?>
             </a>
           <?php endforeach; ?>
@@ -42,14 +42,14 @@
 
         <div class="border-t border-paper-line mt-2 pt-2">
           <a href="<?php echo base_url('worlds/create'); ?>" class="block text-center font-mono text-[10px] uppercase tracking-wider py-1.5 bg-gold hover:bg-gold-light text-paper-ink font-bold transition">
-            ＋ FORGE NEW REALM
+            ＋ New World
           </a>
         </div>
       </div>
     </div>
 
     <span class="text-paper-line hidden sm:inline">|</span>
-    <span class="text-gold hidden sm:inline">CYCLE: <?php echo isset($current_cycle) ? html_escape($current_cycle) : '842 2A'; ?></span>
+    <span class="text-gold hidden sm:inline">Year: <?php echo isset($current_cycle) ? html_escape($current_cycle) : '842 2A'; ?></span>
   </div>
   
   <!-- Archival Status & Quick Controls -->
@@ -59,7 +59,7 @@
       <div class="flex items-center gap-1.5 border border-gold/60 px-2 py-0.5 bg-paper-panel text-gold shadow-ink-sm" title="Logged in as <?php echo html_escape($current_user->username); ?>">
         <span class="w-1.5 h-1.5 bg-gold rotate-45"></span>
         <span class="uppercase tracking-wider font-bold">
-          SCRIBE: <?php echo html_escape($current_user->display_name ? $current_user->display_name : $current_user->username); ?>
+          Author: <?php echo html_escape($current_user->display_name ? $current_user->display_name : $current_user->username); ?>
         </span>
         <span class="text-[9px] text-copper px-1 border border-copper/50 hidden lg:inline">
           <?php echo strtoupper(html_escape($current_user->role ? $current_user->role : 'SCRIBE')); ?>
@@ -68,20 +68,20 @@
     <?php endif; ?>
 
     <span class="hidden md:inline text-parchment-dim">
-      CANON INDEX: <strong class="text-parchment"><?php echo isset($canon_count) ? (int)$canon_count : 0; ?> ENTRIES</strong>
+      Canon: <strong class="text-parchment"><?php echo isset($canon_count) ? (int)$canon_count : 0; ?> ENTRIES</strong>
     </span>
     <span class="hidden md:inline text-parchment-dim">
-      DRAFTS: <strong class="text-copper"><?php echo isset($draft_count) ? (int)$draft_count : 0; ?></strong>
+      Drafts: <strong class="text-copper"><?php echo isset($draft_count) ? (int)$draft_count : 0; ?></strong>
     </span>
     
     <div class="flex items-center gap-1.5 border border-gold/40 px-2 py-0.5 bg-paper-base shadow-ink-sm text-gold">
       <span class="w-1.5 h-1.5 bg-gold rounded-full"></span>
-      <span class="font-bold tracking-wider">SEALED CANON</span>
+      <span class="font-bold tracking-wider">Live</span>
     </div>
     
     <!-- Global Query Search Modal Trigger -->
-    <button type="button" onclick="alert('Global search [CMD+K] palette coming in Phase 2!')" class="border border-paper-line hover:border-gold px-2.5 py-0.5 bg-paper-panel text-parchment transition">
-      [CMD+K] QUERY
+    <button type="button" onclick="alert('Global search coming soon!')" class="border border-paper-line hover:border-gold px-2.5 py-0.5 bg-paper-panel text-parchment transition">
+      Search [CMD+K]
     </button>
   </div>
 </div>

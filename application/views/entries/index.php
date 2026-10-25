@@ -8,7 +8,7 @@
         <span class="w-2 h-2 bg-gold rotate-45 inline-block"></span>
         <span class="font-bold tracking-wider uppercase"><?php echo html_escape($this->session->flashdata('success_msg')); ?></span>
       </div>
-      <span class="text-ash text-[10px] uppercase">CODEX ARCHIVE</span>
+      <span class="text-ash text-[10px] uppercase">Lorekeeper</span>
     </div>
   <?php endif; ?>
 
@@ -16,7 +16,7 @@
     <div class="p-4 border-2 border-crimson bg-crimson-dark/40 font-mono text-xs text-parchment shadow-ink-sm flex items-start gap-3">
       <span class="text-crimson font-bold text-base">⚠️</span>
       <div>
-        <div class="font-bold uppercase tracking-wider text-crimson-seal mb-1">OPERATION ERROR</div>
+        <div class="font-bold uppercase tracking-wider text-crimson-seal mb-1">Error</div>
         <div class="leading-relaxed"><?php echo html_escape($this->session->flashdata('error_msg')); ?></div>
       </div>
     </div>
@@ -29,19 +29,19 @@
     <div class="bg-paper-ink border-b-2 border-paper-line px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono gap-3">
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 bg-gold rotate-45"></span>
-        <span class="text-gold tracking-widest font-bold uppercase">ENCYCLOPEDIA INDEX // FILTER MATRIX</span>
+        <span class="text-gold tracking-widest font-bold uppercase">Entries</span>
         <span class="text-paper-line">|</span>
-        <span class="text-parchment-dim"><?php echo count($entries); ?> RECORDS FOUND</span>
+        <span class="text-parchment-dim"><?php echo count($entries); ?> results</span>
       </div>
 
       <!-- View Switcher: Cards vs Table -->
       <div class="flex items-center gap-1.5">
-        <span class="text-ash text-[10px] uppercase mr-1 hidden sm:inline">DISPLAY:</span>
+        <span class="text-ash text-[10px] uppercase mr-1 hidden sm:inline">View:</span>
         <button type="button" id="btn-view-grid" onclick="setEncyclopediaView('grid')" class="px-2.5 py-1 border border-gold bg-paper-panel text-gold font-bold text-[11px] uppercase tracking-wider transition">
-          [❖ DOSSIER CARDS]
+          ❖ Cards
         </button>
         <button type="button" id="btn-view-table" onclick="setEncyclopediaView('table')" class="px-2.5 py-1 border border-paper-line bg-paper-base text-ash hover:text-parchment text-[11px] uppercase tracking-wider transition">
-          [≡ REGISTRY TABLE]
+          ≡ Table
         </button>
       </div>
     </div>
@@ -53,13 +53,13 @@
         
         <!-- Search Input (5 cols) -->
         <div class="lg:col-span-5 flex flex-col gap-1">
-          <label for="q" class="text-[10px] text-copper uppercase tracking-wider font-bold">SEARCH ARCHIVES</label>
+          <label for="q" class="text-[10px] text-copper uppercase tracking-wider font-bold">Search</label>
           <input type="text" name="q" id="q" value="<?php echo html_escape($search_query); ?>" placeholder="Search by title, synopsis, or chronicle text..." class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-2 text-parchment outline-none transition placeholder:text-ash/50">
         </div>
 
         <!-- Category Select (3 cols) -->
         <div class="lg:col-span-3 flex flex-col gap-1">
-          <label for="type" class="text-[10px] text-ash uppercase tracking-wider">CATEGORY / TEMPLATE</label>
+          <label for="type" class="text-[10px] text-ash uppercase tracking-wider">Category</label>
           <select name="type" id="type" class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-2 text-parchment outline-none transition cursor-pointer">
             <option value="">All Categories</option>
             <?php foreach ($entry_types as $et): ?>
@@ -72,21 +72,21 @@
 
         <!-- Canon Status Select (2 cols) -->
         <div class="lg:col-span-2 flex flex-col gap-1">
-          <label for="status" class="text-[10px] text-ash uppercase tracking-wider">CANON STATUS</label>
+          <label for="status" class="text-[10px] text-ash uppercase tracking-wider">Status</label>
           <select name="status" id="status" class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-2 text-parchment outline-none transition cursor-pointer">
-            <option value="">Active (Canon + Draft)</option>
-            <option value="canon" <?php echo ($selected_status === 'canon') ? 'selected' : ''; ?>>Canon Verified</option>
-            <option value="draft" <?php echo ($selected_status === 'draft') ? 'selected' : ''; ?>>Draft In Progress</option>
-            <option value="archived" <?php echo ($selected_status === 'archived') ? 'selected' : ''; ?>>Archived / Legend</option>
+            <option value="">Active</option>
+            <option value="canon" <?php echo ($selected_status === 'canon') ? 'selected' : ''; ?>>Canon</option>
+            <option value="draft" <?php echo ($selected_status === 'draft') ? 'selected' : ''; ?>>Draft</option>
+            <option value="archived" <?php echo ($selected_status === 'archived') ? 'selected' : ''; ?>>Archived</option>
           </select>
         </div>
 
         <!-- Sort Select (2 cols) -->
         <div class="lg:col-span-2 flex flex-col gap-1">
-          <label for="sort" class="text-[10px] text-ash uppercase tracking-wider">SORT ORDER</label>
+          <label for="sort" class="text-[10px] text-ash uppercase tracking-wider">Sort by</label>
           <select name="sort" id="sort" class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-2 text-parchment outline-none transition cursor-pointer">
             <option value="updated_desc" <?php echo ($selected_sort === 'updated_desc') ? 'selected' : ''; ?>>Recently Updated</option>
-            <option value="created_desc" <?php echo ($selected_sort === 'created_desc') ? 'selected' : ''; ?>>Recently Inscribed</option>
+            <option value="created_desc" <?php echo ($selected_sort === 'created_desc') ? 'selected' : ''; ?>>Recently Added</option>
             <option value="title_asc" <?php echo ($selected_sort === 'title_asc') ? 'selected' : ''; ?>>Alphabetical (A–Z)</option>
           </select>
         </div>
@@ -98,7 +98,7 @@
         
         <!-- Category Quick Filter Chips -->
         <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
-          <span class="text-ash mr-1 uppercase text-[10px]">QUICK FILTER:</span>
+          <span class="text-ash mr-1 uppercase text-[10px]">Filter:</span>
           <a href="<?php echo base_url('entries'); ?>" class="px-2.5 py-1 border <?php echo empty($selected_type) ? 'border-gold text-gold bg-paper-deep font-bold' : 'border-paper-line text-ash hover:text-parchment bg-paper-base'; ?> transition">
             ALL
           </a>
@@ -113,11 +113,11 @@
         <div class="flex items-center gap-2">
           <?php if (!empty($search_query) || !empty($selected_type) || !empty($selected_status) || !empty($selected_tag)): ?>
             <a href="<?php echo base_url('entries'); ?>" class="border border-paper-line hover:border-copper px-3 py-1.5 text-copper bg-paper-base text-[11px] uppercase tracking-wider transition">
-              [✕ CLEAR]
+              ✕ Clear
             </a>
           <?php endif; ?>
           <button type="submit" class="border-2 border-gold bg-gold hover:bg-gold-light text-paper-ink font-bold px-5 py-1.5 text-[11px] uppercase tracking-widest shadow-ink-sm transition">
-            APPLY FILTER
+            Filter
           </button>
         </div>
 
@@ -147,16 +147,16 @@
       <div class="w-12 h-12 border-2 border-gold rotate-45 flex items-center justify-center mb-2">
         <span class="w-4 h-4 bg-gold/40"></span>
       </div>
-      <h2 class="font-display font-bold text-3xl text-gold uppercase tracking-wider">No Recorded Chronicles Found</h2>
+      <h2 class="font-display font-bold text-3xl text-gold uppercase tracking-wider">No Entries Found</h2>
       <p class="font-prose text-parchment-dim max-w-md text-base">
-        No lore entries match your current query parameters, or this category of the Codex has not yet been inscribed.
+        No entries match your search, or this category has no entries yet.
       </p>
       <div class="flex flex-wrap justify-center gap-3 mt-2 font-mono text-xs">
         <a href="<?php echo base_url('entries'); ?>" class="border-2 border-paper-line hover:border-parchment px-4 py-2 text-parchment-dim bg-paper-base uppercase tracking-wider transition">
-          RESET FILTERS
+          Clear Filters
         </a>
         <a href="<?php echo base_url('entries/create'); ?>" class="border-2 border-gold bg-gold hover:bg-gold-light text-paper-ink font-bold px-5 py-2 uppercase tracking-widest shadow-ink-sm transition">
-          ＋ INSCRIBE FIRST ENTRY
+          ＋ Create First Entry
         </a>
       </div>
     </div>
@@ -175,7 +175,7 @@
                 <span class="w-1.5 h-1.5 bg-gold rotate-45"></span>
                 <span class="text-gold font-bold uppercase tracking-wider"><?php echo html_escape($entry->type_name); ?></span>
               </div>
-              <span class="text-ash text-[10px]">REF #<?php echo str_pad($entry->id, 3, '0', STR_PAD_LEFT); ?></span>
+              <span class="text-ash text-[10px]">#<?php echo str_pad($entry->id, 3, '0', STR_PAD_LEFT); ?></span>
             </div>
 
             <div class="p-5 flex flex-col gap-4">
@@ -236,12 +236,12 @@
           <!-- CARD FOOTER -->
           <div class="border-t-2 border-paper-line px-5 py-3 bg-paper-base/50 flex flex-wrap items-center justify-between font-mono text-[11px] gap-2">
             <div class="flex items-center gap-2 text-ash">
-              <span>SCRIBE: <strong class="text-parchment"><?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : 'Archivist Zerotsu'); ?></strong></span>
+              <span>By: <strong class="text-parchment"><?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : 'Archivist Zerotsu'); ?></strong></span>
               <span class="text-paper-line">•</span>
-              <span>UPDATED: <?php echo date('M d, Y', strtotime($entry->updated_at)); ?></span>
+              <span>Updated: <?php echo date('M d, Y', strtotime($entry->updated_at)); ?></span>
             </div>
             <a href="<?php echo base_url('entries/view/' . $entry->id); ?>" class="text-gold font-bold hover:underline uppercase tracking-wider">
-              OPEN DOSSIER &rarr;
+              View Entry &rarr;
             </a>
           </div>
 
@@ -255,12 +255,12 @@
       <table class="w-full text-left border-collapse font-mono text-xs">
         <thead>
           <tr class="bg-paper-ink border-b-2 border-paper-line text-gold uppercase tracking-wider text-[11px]">
-            <th class="py-3 px-4">REF ID</th>
-            <th class="py-3 px-4">ENTRY TITLE</th>
-            <th class="py-3 px-4">CATEGORY</th>
-            <th class="py-3 px-4">STATUS</th>
-            <th class="py-3 px-4">LAST UPDATED</th>
-            <th class="py-3 px-4 text-right">ACTION</th>
+            <th class="py-3 px-4">#</th>
+            <th class="py-3 px-4">Title</th>
+            <th class="py-3 px-4">Category</th>
+            <th class="py-3 px-4">Status</th>
+            <th class="py-3 px-4">Last Updated</th>
+            <th class="py-3 px-4 text-right">Action</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-paper-line">

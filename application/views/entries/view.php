@@ -5,7 +5,7 @@
       <span class="w-2 h-2 bg-gold rotate-45 inline-block"></span>
       <span class="font-bold tracking-wider uppercase"><?php echo html_escape($this->session->flashdata('success_msg')); ?></span>
     </div>
-    <span class="text-ash text-[10px] uppercase">CODEX UPDATED</span>
+    <span class="text-ash text-[10px] uppercase">Updated</span>
   </div>
 <?php endif; ?>
 
@@ -13,7 +13,7 @@
   <div class="mb-6 p-4 border-2 border-crimson bg-crimson-dark/40 font-mono text-xs text-parchment shadow-ink-sm flex items-start gap-3">
     <span class="text-crimson font-bold text-base">⚠️</span>
     <div>
-      <div class="font-bold uppercase tracking-wider text-crimson-seal mb-1">OPERATION ERROR</div>
+      <div class="font-bold uppercase tracking-wider text-crimson-seal mb-1">Error</div>
       <div class="leading-relaxed"><?php echo html_escape($this->session->flashdata('error_msg')); ?></div>
     </div>
   </div>
@@ -25,12 +25,12 @@
     <div class="flex items-center gap-3">
       <span class="text-base">⚠️</span>
       <div>
-        <span class="font-bold tracking-wider uppercase">THIS RECORD IS CURRENTLY ARCHIVED / SEALED</span>
-        <div class="text-ash text-[11px] mt-0.5">Sealed on <?php echo html_escape($entry->deleted_at); ?>. It is hidden from the active codex.</div>
+        <span class="font-bold tracking-wider uppercase">This entry is currently archived</span>
+        <div class="text-ash text-[11px] mt-0.5">Archived on <?php echo html_escape($entry->deleted_at); ?>. It is hidden from the active list.</div>
       </div>
     </div>
     <a href="<?php echo base_url('entries/restore/' . $entry->id); ?>" class="px-4 py-1.5 border border-gold bg-gold hover:bg-gold-light text-paper-ink font-bold tracking-widest uppercase transition">
-      ✦ UNSEAL &amp; RESTORE RECORD
+      ✦ Restore Entry
     </a>
   </div>
 <?php endif; ?>
@@ -47,9 +47,9 @@
       <div class="bg-paper-ink border-b-2 border-paper-line px-4 py-2.5 flex items-center justify-between text-xs font-mono">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 bg-gold rotate-45"></span>
-          <span class="text-gold tracking-widest font-bold">DOSSIER // <?php echo html_escape(strtoupper($entry->type_slug)); ?></span>
+          <span class="text-gold tracking-widest font-bold">Entry &mdash; <?php echo html_escape(strtoupper($entry->type_slug)); ?></span>
         </div>
-        <span class="text-ash text-[10px]">RECORD #<?php echo (int)$entry->id; ?></span>
+        <span class="text-ash text-[10px]">#<?php echo (int)$entry->id; ?></span>
       </div>
 
       <div class="p-5 flex flex-col gap-5">
@@ -129,15 +129,15 @@
                 <line x1="10" y1="50" x2="90" y2="50" stroke="currentColor" stroke-width="1"/>
               </svg>
 
-              <span class="font-display italic text-base text-copper mb-1">[No Illuminated Portrait]</span>
+              <span class="font-display italic text-base text-copper mb-1">[No Portrait]</span>
               <p class="font-mono text-[10px] text-ash tracking-wider uppercase mb-3 max-w-[200px]">
-                Drop image here or click below to inscribe portrait
+                Drop image here or click below to upload portrait
               </p>
 
               <button type="button" 
                       onclick="document.getElementById('portrait-file-input').click()" 
                       class="px-3.5 py-1.5 bg-paper-panel hover:bg-gold hover:text-paper-ink border-2 border-gold text-gold font-mono text-[10px] uppercase font-bold tracking-wider transition shadow-ink-sm flex items-center gap-1.5 z-10 cursor-pointer">
-                <span>＋</span> INSCRIBE PORTRAIT
+                <span>＋</span> Upload Portrait
               </button>
             </div>
 
@@ -145,7 +145,7 @@
             <div id="portrait-uploading-overlay" class="hidden absolute inset-0 bg-paper-ink/90 flex flex-col items-center justify-center gap-2 z-30">
               <div class="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin"></div>
               <span class="font-mono text-[10px] text-gold uppercase tracking-widest font-bold">
-                INSCRIBING PORTRAIT...
+                Uploading...
               </span>
             </div>
 
@@ -154,7 +154,7 @@
           <?php if (!empty($attachments)): ?>
             <!-- Quick Link to Concept Art Folio -->
             <a href="#concept-art-folio" class="w-full mt-2 py-1 px-2.5 border border-paper-line hover:border-gold bg-paper-deep text-[10px] font-mono text-copper hover:text-gold flex items-center justify-between transition shadow-ink-sm">
-              <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-copper rotate-45 inline-block"></span> CONCEPT ART FOLIO</span>
+              <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-copper rotate-45 inline-block"></span> Image Gallery</span>
               <span class="text-gold font-bold">[<?php echo count($attachments); ?> <?php echo count($attachments) === 1 ? 'PLATE' : 'PLATES'; ?> &darr;]</span>
             </a>
           <?php endif; ?>
@@ -182,11 +182,11 @@
         <div class="flex flex-wrap justify-center items-center gap-2.5 py-1">
           <?php if ($entry->status === 'canon'): ?>
             <span class="font-mono font-bold text-xs uppercase tracking-widest text-gold border-2 border-gold px-3 py-0.5 -rotate-2 shadow-ink-sm bg-paper-base">
-              CANON VERIFIED
+              Canon
             </span>
           <?php elseif ($entry->status === 'draft'): ?>
             <span class="font-mono font-bold text-xs uppercase tracking-widest text-copper border-2 border-copper px-3 py-0.5 rotate-2 shadow-ink-sm bg-paper-base">
-              DRAFT RECORD
+              Draft
             </span>
           <?php elseif ($entry->status === 'apocrypha'): ?>
             <span class="font-mono font-bold text-xs uppercase tracking-widest text-purple-300 border-2 border-purple-400 px-3 py-0.5 shadow-ink-sm bg-paper-base">
@@ -211,8 +211,8 @@
         <?php if (!empty($properties)): ?>
           <div class="border-t-2 border-paper-line pt-3 font-mono text-xs">
             <div class="flex items-center justify-between pb-2 mb-1 border-b border-paper-line/60 text-[10px] uppercase tracking-wider text-copper">
-              <span>[DOSSIER ATTRIBUTES]</span>
-              <span>TELEMETRY</span>
+              <span>Attributes</span>
+              
             </div>
             <div class="divide-y divide-paper-line/60">
               <?php foreach ($properties as $prop): ?>
@@ -231,26 +231,26 @@
         <div class="flex flex-col gap-2 pt-2 border-t border-paper-line">
           <div class="grid grid-cols-2 gap-2">
             <a href="<?php echo base_url('entries/edit/' . $entry->id); ?>" class="border-2 border-gold py-2 text-center font-mono text-xs uppercase tracking-wider text-paper-ink font-bold bg-gold hover:bg-gold-light transition shadow-ink-sm">
-              [EDIT RECORD]
+              Edit Entry
             </a>
             <a href="<?php echo base_url('entries/create'); ?>" class="border-2 border-paper-line hover:border-gold py-2 text-center font-mono text-xs uppercase tracking-wider text-parchment bg-paper-base transition">
-              [＋ NEW ENTRY]
+              ＋ New Entry
             </a>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <?php if (empty($entry->is_archived)): ?>
-              <a href="<?php echo base_url('entries/archive/' . $entry->id); ?>" onclick="return confirm('Seal this record into the archives?');" class="border border-crimson/70 hover:border-crimson py-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-crimson hover:bg-crimson/10 transition">
-                [SEAL / ARCHIVE]
+              <a href="<?php echo base_url('entries/archive/' . $entry->id); ?>" onclick="return confirm('Archive this entry?');" class="border border-crimson/70 hover:border-crimson py-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-crimson hover:bg-crimson/10 transition">
+                Archive
               </a>
             <?php else: ?>
               <a href="<?php echo base_url('entries/restore/' . $entry->id); ?>" class="border border-gold hover:border-gold py-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-gold hover:bg-gold/10 transition">
-                [UNSEAL RECORD]
+                Restore
               </a>
             <?php endif; ?>
             
             <a href="<?php echo base_url('entries'); ?>" class="border border-paper-line hover:border-parchment-dark py-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-ash hover:text-parchment transition">
-              [ALL RECORDS]
+              All Entries
             </a>
           </div>
         </div>
@@ -270,16 +270,16 @@
       <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-3 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
         <div class="flex items-center gap-2">
           <span class="text-gold">✦</span>
-          <span class="tracking-widest uppercase font-bold text-parchment">CHRONICLE FOLIO // <?php echo html_escape($entry->slug); ?></span>
+          <span class="tracking-widest uppercase font-bold text-parchment">Entry // <?php echo html_escape($entry->slug); ?></span>
           <span class="text-paper-line">|</span>
           <span class="text-ash"><?php echo html_escape($entry->type_name); ?></span>
         </div>
         <div class="flex items-center gap-3 text-ash text-[11px]">
           <span class="text-gold font-bold">
-            SCRIBE: <?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : (!empty($entry->author_username) ? $entry->author_username : 'Archivist Zerotsu')); ?>
+            By: <?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : (!empty($entry->author_username) ? $entry->author_username : 'Archivist Zerotsu')); ?>
           </span>
           <span class="text-paper-line">|</span>
-          <span>RECORDED: <?php echo date('M d, Y', strtotime($entry->created_at)); ?></span>
+          <span>Added: <?php echo date('M d, Y', strtotime($entry->created_at)); ?></span>
           <span class="text-paper-line">|</span>
           <span class="text-copper font-bold uppercase"><?php echo html_escape($entry->status); ?></span>
         </div>
@@ -290,8 +290,8 @@
         <!-- ARTICLE HEADER -->
         <div class="border-b-2 border-paper-line pb-6">
           <div class="font-mono text-xs uppercase tracking-widest text-copper mb-1 flex items-center justify-between">
-            <span>RECORD OF CANAAN · PUBLIC ID: <?php echo html_escape($entry->public_id); ?></span>
-            <span class="text-ash text-[10px]">INSCRIBED BY <?php echo strtoupper(html_escape(!empty($entry->author_name) ? $entry->author_name : 'ARCHIVIST ZEROTSU')); ?></span>
+            <span>Public ID: <?php echo html_escape($entry->public_id); ?></span>
+            <span class="text-ash text-[10px]">By <?php echo strtoupper(html_escape(!empty($entry->author_name) ? $entry->author_name : 'ARCHIVIST ZEROTSU')); ?></span>
           </div>
           <h1 class="font-display font-bold text-3xl sm:text-5xl text-gold tracking-wide uppercase leading-tight">
             <?php echo html_escape($entry->title); ?>
@@ -311,7 +311,7 @@
         <!-- ARTICLE FOOTER & METADATA LEDGER -->
         <div class="border-t-2 border-paper-line pt-4 flex flex-col sm:flex-row sm:items-center justify-between font-mono text-xs text-ash gap-3">
           <div class="flex items-center gap-2">
-            <span class="text-gold font-bold">TAGS:</span>
+            <span class="text-gold font-bold">Tags:</span>
             <?php if (!empty($tags)): ?>
               <?php foreach ($tags as $t): ?>
                 <a href="<?php echo base_url('entries?tag=' . urlencode($t->slug)); ?>" class="border border-paper-line hover:border-gold px-2 py-0.5 bg-paper-base text-parchment hover:text-gold transition">
@@ -319,15 +319,15 @@
                 </a>
               <?php endforeach; ?>
             <?php else: ?>
-              <span class="text-ash/60 italic text-[11px]">No tags indexed</span>
+              <span class="text-ash/60 italic text-[11px]">No tags</span>
             <?php endif; ?>
           </div>
           <div class="flex items-center gap-3 text-[11px] text-ash">
-            <span>SCRIBE: <strong class="text-parchment"><?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : 'Archivist Zerotsu'); ?></strong></span>
+            <span>By: <strong class="text-parchment"><?php echo html_escape(!empty($entry->author_name) ? $entry->author_name : 'Archivist Zerotsu'); ?></strong></span>
             <?php if (!empty($entry->updater_name) && $entry->updater_name !== $entry->author_name): ?>
-              <span>• REVISED BY: <strong class="text-copper"><?php echo html_escape($entry->updater_name); ?></strong></span>
+              <span>• Edited by: <strong class="text-copper"><?php echo html_escape($entry->updater_name); ?></strong></span>
             <?php endif; ?>
-            <span>• AMENDED: <?php echo date('Y-m-d H:i', strtotime($entry->updated_at)); ?></span>
+            <span>• Updated: <?php echo date('Y-m-d H:i', strtotime($entry->updated_at)); ?></span>
           </div>
         </div>
 
@@ -336,21 +336,21 @@
     </article>
 
     <!-- ================================================================= -->
-    <!-- CONCEPT ART FOLIO & SUPPORTING ATTACHMENTS (GALLERY DRAWER)       -->
+    <!-- Image Gallery & SUPPORTING ATTACHMENTS (GALLERY DRAWER)       -->
     <!-- ================================================================= -->
     <section id="concept-art-folio" class="bg-paper-panel border-2 border-paper-line shadow-ink overflow-hidden">
       <!-- Flush Grimoire Title Bar -->
       <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 bg-gold rotate-45"></span>
-          <span class="text-gold font-bold tracking-widest uppercase">CONCEPT ART FOLIO // SUPPORTING ILLUMINATIONS</span>
+          <span class="text-gold font-bold tracking-widest uppercase">Image Gallery // SUPPORTING ILLUMINATIONS</span>
         </div>
         <div class="flex items-center gap-3">
           <span class="text-ash text-[10px]" id="folio-count-badge">
             <?php echo count($attachments); ?> <?php echo count($attachments) === 1 ? 'ATTACHMENT' : 'ATTACHMENTS'; ?>
           </span>
           <button type="button" onclick="document.getElementById('folio-upload-input').click()" class="border border-gold text-gold hover:bg-gold hover:text-paper-ink px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition flex items-center gap-1 shadow-ink-sm">
-            <span>＋</span> INSCRIBE ATTACHMENT
+            <span>＋</span> Add Image
           </button>
         </div>
       </div>
@@ -361,9 +361,9 @@
         <div id="folio-upload-status" class="hidden font-mono text-xs text-gold bg-paper-ink border border-gold/60 p-2.5 shadow-ink-sm flex items-center justify-between">
           <div class="flex items-center gap-2">
             <span class="w-2.5 h-2.5 border-2 border-gold border-t-transparent animate-spin inline-block"></span>
-            <span id="folio-upload-status-text" class="font-bold tracking-wider">INSCRIBING ILLUMINATION INTO FOLIO...</span>
+            <span id="folio-upload-status-text" class="font-bold tracking-wider">Uploading...</span>
           </div>
-          <span class="text-[10px] text-ash">RECORDING TO VAULT</span>
+          <span class="text-[10px] text-ash">Please wait</span>
         </div>
 
         <!-- Hidden File Input for Folio Uploader -->
@@ -373,10 +373,10 @@
         <div id="folio-dropzone-area" class="border-2 border-dashed border-paper-line/70 hover:border-gold p-4 bg-paper-deep/50 text-center transition cursor-pointer group" onclick="document.getElementById('folio-upload-input').click()">
           <div class="flex flex-col items-center justify-center gap-1">
             <div class="flex items-center gap-2 text-gold text-xs font-mono font-bold uppercase tracking-wider group-hover:translate-y-[-1px] transition">
-              <span>🖼</span> DRAG &amp; DROP CONCEPT ART, ORTHOGRAPHICS, OR MAPS HERE
+              <span>🖼</span> Drag &amp; drop images here
             </div>
             <p class="font-mono text-[10px] text-ash">
-              Supports PNG, JPG, WEBP, SVG up to 15MB · Inscribed into <code class="text-gold font-mono">media_attachments</code>
+              Supports PNG, JPG, WEBP, SVG up to 15MB · Saved to media attachments
             </p>
           </div>
         </div>
@@ -400,7 +400,7 @@
 
                   <!-- Cover Stamp Badge -->
                   <span id="folio-cover-badge-<?php echo $att->id; ?>" class="folio-cover-badge absolute top-1.5 left-1.5 bg-gold text-paper-ink font-mono text-[9px] font-bold px-1.5 py-0.5 shadow-ink-sm uppercase <?php echo $is_cover ? '' : 'hidden'; ?>">
-                    ★ COVER
+                    ★ Cover
                   </span>
 
                   <!-- Enlarge Badge on Hover -->
@@ -423,7 +423,7 @@
                 <!-- Hover Quick Actions Toolbar -->
                 <div class="pt-1.5 flex items-center justify-between font-mono text-[9px] gap-1">
                   <button type="button" onclick="setFolioAsCover(<?php echo $att->id; ?>, '<?php echo html_escape($att->file_path); ?>')" title="Set as main dossier cover portrait" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-panel text-ash hover:text-gold transition uppercase">
-                    ★ Set Cover
+                    ★ Set as Cover
                   </button>
                   <button type="button" onclick="copyFolioMarkdownTag('<?php echo html_escape($att->caption ? $att->caption : 'Plate'); ?>', '<?php echo html_escape($att->file_path); ?>')" title="Copy Markdown Tag for article prose" class="border border-paper-line hover:border-copper px-1.5 py-0.5 bg-paper-panel text-ash hover:text-copper transition uppercase">
                     📋 Copy Tag
@@ -455,14 +455,14 @@
       <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex flex-wrap items-center justify-between text-xs font-mono gap-2">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 bg-gold rotate-45"></span>
-          <span class="text-gold font-bold tracking-widest uppercase">SWORN BONDS &amp; TIES // RELATIONSHIP MATRIX</span>
+          <span class="text-gold font-bold tracking-widest uppercase">Relationships</span>
         </div>
         <div class="flex items-center gap-3">
           <span class="text-ash text-[10px]">
-            <?php echo count($outbound_relationships) + count($inbound_relationships); ?> ACTIVE BONDS
+            <?php echo count($outbound_relationships) + count($inbound_relationships); ?> connections
           </span>
           <button type="button" onclick="document.getElementById('forge-bond-modal').classList.remove('hidden')" class="border border-gold text-gold hover:bg-gold hover:text-paper-ink px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition">
-            ＋ FORGE BOND
+            ＋ Add Relationship
           </button>
         </div>
       </div>
@@ -471,9 +471,9 @@
         
         <?php if (empty($outbound_relationships) && empty($inbound_relationships)): ?>
           <div class="text-center py-6 border border-dashed border-paper-line">
-            <p class="font-prose italic text-sm text-ash mb-3">No sworn bonds or alliances recorded for this entity yet.</p>
+            <p class="font-prose italic text-sm text-ash mb-3">No relationships added yet.</p>
             <button type="button" onclick="document.getElementById('forge-bond-modal').classList.remove('hidden')" class="border-2 border-gold px-4 py-1.5 font-mono text-xs text-gold hover:bg-gold hover:text-paper-ink uppercase tracking-wider transition font-bold shadow-ink-sm">
-              [＋ FORGE FIRST BOND]
+              ＋ Add First Relationship
             </button>
           </div>
         <?php endif; ?>
@@ -482,7 +482,7 @@
         <?php if (!empty($outbound_relationships)): ?>
           <div>
             <div class="font-mono text-[10px] text-copper uppercase tracking-widest mb-3 flex items-center gap-2">
-              <span>▶ OUTGOING CONNECTIONS (ORIGINATED BONDS)</span>
+              <span>▶ Outgoing Connections</span>
               <span class="flex-1 h-px bg-paper-line/50"></span>
             </div>
 
@@ -509,10 +509,10 @@
                   </div>
 
                   <div class="border-t border-paper-line/70 pt-2 mt-3 flex items-center justify-between font-mono text-[10px]">
-                    <span class="text-ash text-[9px]">INVERSE: <?php echo html_escape($ob->inverse_label); ?></span>
-                    <form action="<?php echo base_url('relationships/delete/' . $ob->id); ?>" method="POST" onsubmit="return confirm('Dissolve this bond between <?php echo html_escape($entry->title); ?> and <?php echo html_escape($ob->target_title); ?>?');" class="inline">
+                    <span class="text-ash text-[9px]">Reverse: <?php echo html_escape($ob->inverse_label); ?></span>
+                    <form action="<?php echo base_url('relationships/delete/' . $ob->id); ?>" method="POST" onsubmit="return confirm('Remove this relationship between <?php echo html_escape($entry->title); ?> and <?php echo html_escape($ob->target_title); ?>?');" class="inline">
                       <button type="submit" class="text-crimson hover:underline uppercase text-[9px] tracking-wider">
-                        [✕ UNBIND]
+                        Remove
                       </button>
                     </form>
                   </div>
@@ -526,7 +526,7 @@
         <?php if (!empty($inbound_relationships)): ?>
           <div>
             <div class="font-mono text-[10px] text-gold uppercase tracking-widest mb-3 flex items-center gap-2">
-              <span>◀ INCOMING CONNECTIONS (RECIPROCAL TIES)</span>
+              <span>◀ Incoming Connections</span>
               <span class="flex-1 h-px bg-paper-line/50"></span>
             </div>
 
@@ -553,10 +553,10 @@
                   </div>
 
                   <div class="border-t border-paper-line/70 pt-2 mt-3 flex items-center justify-between font-mono text-[10px]">
-                    <span class="text-ash text-[9px]">FORWARD: <?php echo html_escape($ib->relationship_type); ?></span>
-                    <form action="<?php echo base_url('relationships/delete/' . $ib->id); ?>" method="POST" onsubmit="return confirm('Dissolve this bond between <?php echo html_escape($ib->source_title); ?> and <?php echo html_escape($entry->title); ?>?');" class="inline">
+                    <span class="text-ash text-[9px]">Forward: <?php echo html_escape($ib->relationship_type); ?></span>
+                    <form action="<?php echo base_url('relationships/delete/' . $ib->id); ?>" method="POST" onsubmit="return confirm('Remove this relationship between <?php echo html_escape($ib->source_title); ?> and <?php echo html_escape($entry->title); ?>?');" class="inline">
                       <button type="submit" class="text-crimson hover:underline uppercase text-[9px] tracking-wider">
-                        [✕ UNBIND]
+                        Remove
                       </button>
                     </form>
                   </div>
@@ -575,9 +575,9 @@
         <div class="bg-paper-ink border-b-2 border-paper-line px-5 py-2.5 flex items-center justify-between text-xs font-mono">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 bg-copper rotate-45"></span>
-            <span class="text-gold font-bold tracking-widest uppercase">REFERENCED IN OTHER CHRONICLES // BACKLINKS</span>
+            <span class="text-gold font-bold tracking-widest uppercase">Referenced In</span>
           </div>
-          <span class="text-ash text-[10px]"><?php echo count($backlinks); ?> REFERENCES DETECTED</span>
+          <span class="text-ash text-[10px]"><?php echo count($backlinks); ?> references</span>
         </div>
 
         <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -596,7 +596,7 @@
                 </p>
               </div>
               <div class="border-t border-paper-line/80 pt-2 mt-3 flex items-center justify-between font-mono text-[10px] text-ash">
-                <span class="group-hover:text-gold transition">CONSULT RECORD &rarr;</span>
+                <span class="group-hover:text-gold transition">View Entry &rarr;</span>
                 <span class="text-gold">✦</span>
               </div>
             </a>
@@ -616,7 +616,7 @@
   <div class="bg-paper-panel border-2 border-gold max-w-lg w-full p-6 shadow-ink-lg relative">
     <div class="flex items-center justify-between border-b-2 border-paper-line pb-3 mb-4 font-mono text-xs">
       <span class="text-gold font-bold tracking-widest uppercase flex items-center gap-2">
-        <span class="w-2 h-2 bg-gold rotate-45"></span> FORGE DIRECTED BOND
+        <span class="w-2 h-2 bg-gold rotate-45"></span> Add Relationship
       </span>
       <button type="button" onclick="document.getElementById('forge-bond-modal').classList.add('hidden')" class="text-ash hover:text-gold text-base leading-none">
         ✕
@@ -628,15 +628,15 @@
 
       <!-- Source Origin Indicator -->
       <div class="bg-paper-base border border-paper-line p-2 text-[11px] text-parchment flex items-center justify-between">
-        <span class="text-ash uppercase">SOURCE ORIGIN:</span>
+        <span class="text-ash uppercase">From:</span>
         <strong class="text-gold uppercase"><?php echo html_escape($entry->title); ?></strong>
       </div>
 
       <!-- Target Entity Select -->
       <div class="flex flex-col gap-1">
-        <label for="target_entry_id" class="text-[10px] text-copper uppercase tracking-wider font-bold">CONNECT TO TARGET ENTITY *</label>
+        <label for="target_entry_id" class="text-[10px] text-copper uppercase tracking-wider font-bold">Link to Entry *</label>
         <select name="target_entry_id" id="target_entry_id" required class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-2 text-parchment outline-none transition cursor-pointer">
-          <option value="">-- Select Connected Entity --</option>
+          <option value="">-- Select an entry --</option>
           <?php if (!empty($other_entries)): ?>
             <?php foreach ($other_entries as $oe): ?>
               <option value="<?php echo $oe->id; ?>">
@@ -649,9 +649,9 @@
 
       <!-- Predicate Preset Selector -->
       <div class="flex flex-col gap-1">
-        <label for="preset_selector" class="text-[10px] text-ash uppercase tracking-wider">PRESET TEMPLATES</label>
+        <label for="preset_selector" class="text-[10px] text-ash uppercase tracking-wider">Quick Presets</label>
         <select id="preset_selector" onchange="applyPreset(this.value)" class="w-full bg-paper-base border border-paper-line focus:border-gold px-2.5 py-1.5 text-parchment-dim outline-none transition cursor-pointer text-[11px]">
-          <option value="">-- Choose Common Preset --</option>
+          <option value="">-- Choose a preset --</option>
           <option value="bearer of|wielded by">Bearer / Wielder (bearer of &harr; wielded by)</option>
           <option value="sworn ally of|sworn ally of">Alliance (sworn ally of &harr; sworn ally of)</option>
           <option value="sworn warden of|protected by">Guardian (sworn warden of &harr; protected by)</option>
@@ -670,19 +670,19 @@
       <!-- Forward & Inverse Predicates -->
       <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1">
-          <label for="relationship_type" class="text-[10px] text-gold uppercase tracking-wider font-bold">FORWARD PREDICATE *</label>
+          <label for="relationship_type" class="text-[10px] text-gold uppercase tracking-wider font-bold">Relationship Label *</label>
           <input type="text" name="relationship_type" id="relationship_type" required placeholder="e.g. bearer of" class="w-full bg-paper-base border-2 border-paper-line focus:border-gold px-3 py-1.5 text-parchment outline-none transition text-xs">
         </div>
 
         <div class="flex flex-col gap-1">
-          <label for="inverse_label" class="text-[10px] text-ash uppercase tracking-wider">INVERSE LABEL</label>
+          <label for="inverse_label" class="text-[10px] text-ash uppercase tracking-wider">Reverse Label</label>
           <input type="text" name="inverse_label" id="inverse_label" placeholder="e.g. wielded by" class="w-full bg-paper-base border border-paper-line focus:border-gold px-3 py-1.5 text-parchment outline-none transition text-xs">
         </div>
       </div>
 
       <!-- Description / Context Note -->
       <div class="flex flex-col gap-1">
-        <label for="description" class="text-[10px] text-ash uppercase tracking-wider">LORE CONTEXT NOTE [OPTIONAL]</label>
+        <label for="description" class="text-[10px] text-ash uppercase tracking-wider">Notes (optional)</label>
         <textarea name="description" id="description" rows="2" placeholder="e.g. Sanctified during the Solstice Crossing of 842 2A..." class="w-full bg-paper-base border border-paper-line focus:border-gold px-3 py-1.5 text-parchment outline-none transition text-xs resize-none"></textarea>
       </div>
 
@@ -692,7 +692,7 @@
           CANCEL
         </button>
         <button type="submit" class="px-5 py-2 border-2 border-gold bg-gold hover:bg-gold-light text-paper-ink font-bold transition uppercase tracking-wider text-xs shadow-ink-sm">
-          FORGE BOND ➔
+          Add Relationship ➔
         </button>
       </div>
     </form>
@@ -817,7 +817,7 @@
     });
   }
 
-  // --- CONCEPT ART FOLIO & SUPPORTING GALLERY HANDLERS ---
+  // --- Image Gallery & SUPPORTING GALLERY HANDLERS ---
   function handleFolioFileSelect(input) {
     if (input.files && input.files.length > 0) {
       uploadFolioFile(input.files[0]);

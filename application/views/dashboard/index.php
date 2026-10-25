@@ -96,7 +96,7 @@
         <div class="relative z-10 flex items-center justify-between text-[10px] font-mono text-gold/70 tracking-widest uppercase">
           <span>+ REG. 54°12'N // IRON PASS SURVEY</span>
           <span class="border border-gold/40 bg-paper-ink/80 px-2.5 py-0.5 text-copper">
-            [ARTWORK PLACEHOLDER // HERO PANORAMA PLATE]
+            [Banner image]
           </span>
           <span>EPOCH: <?php echo html_escape($current_cycle); ?> +</span>
         </div>
@@ -108,7 +108,7 @@
               <span>✦</span> REALM OF <?php echo strtoupper(html_escape($world_name)); ?>
             </span>
             <span class="font-mono text-[11px] uppercase tracking-widest text-gold border border-gold/60 bg-paper-ink/90 px-3 py-0.5">
-              <?php echo (int)$total_entries; ?> INSCRIBED RECORDS
+              <?php echo (int)$total_entries; ?> entries
             </span>
           </div>
 
@@ -127,27 +127,27 @@
               <input
                 type="text"
                 name="q"
-                placeholder="Search characters, realms, sacred orders, or relics to read..."
+                placeholder="Search entries..."
                 class="w-full bg-paper-ink/95 border-2 border-paper-line focus:border-gold pl-9 pr-4 py-2.5 text-sm font-prose text-parchment placeholder-ash/70 focus:outline-none shadow-ink-sm"
               >
             </div>
             <button type="submit" class="px-6 py-2.5 bg-gold hover:bg-gold-light text-paper-ink font-mono font-bold text-xs uppercase tracking-widest border-2 border-gold shadow-ink-sm transition">
-              CONSULT ARCHIVE
+              Search
             </button>
           </form>
 
           <!-- Quick Reader Jumps -->
           <div class="flex flex-wrap items-center justify-center gap-4 mt-5 font-mono text-[11px] uppercase tracking-wider">
             <a href="#archive-tomes" class="text-gold hover:text-gold-light border-b border-gold/50 pb-0.5 transition">
-              ↓ Browse the Five Tomes
+              ↓ Browse Categories
             </a>
             <span class="text-paper-line">•</span>
             <a href="#world-compendium" class="text-parchment-dim hover:text-gold border-b border-transparent hover:border-gold/50 pb-0.5 transition">
-              ↓ Read World History &amp; Atlas
+              ↓ World Overview
             </a>
             <span class="text-paper-line">•</span>
             <a href="#chronology-ribbon" class="text-parchment-dim hover:text-gold border-b border-transparent hover:border-gold/50 pb-0.5 transition">
-              ↓ Traverse the Timeline
+              ↓ Timeline
             </a>
           </div>
         </div>
@@ -179,7 +179,7 @@
         </h2>
       </div>
       <a href="<?php echo base_url('entries'); ?>" class="font-mono text-xs uppercase tracking-widest text-parchment-dim hover:text-gold transition">
-        [VIEW COMPLETE REGISTRY INDEX &rarr;]
+        View All &rarr;
       </a>
     </div>
 
@@ -262,10 +262,10 @@
             <!-- Bottom Brass Record Count Plate -->
             <div class="border-t border-paper-line pt-2.5 flex items-center justify-between font-mono text-[10px]">
               <span class="text-parchment-dim font-bold">
-                <?php echo sprintf('%02d', (int)$tome->entry_count); ?> <?php echo ((int)$tome->entry_count === 1) ? 'RECORD' : 'RECORDS'; ?>
+                <?php echo sprintf('%02d', (int)$tome->entry_count); ?> <?php echo ((int)$tome->entry_count === 1) ? 'entry' : 'entries'; ?>
               </span>
               <span class="text-gold group-hover:translate-x-0.5 transition uppercase">
-                OPEN TOME &rarr;
+                Browse &rarr;
               </span>
             </div>
 
@@ -339,7 +339,7 @@
                   <?php echo sprintf('%02d', (int)$ext->entry_count); ?>
                 </span>
                 <span class="font-mono text-[9px] text-gold uppercase group-hover:underline">
-                  OPEN &rarr;
+                  Open &rarr;
                 </span>
               </div>
             </a>
@@ -363,7 +363,7 @@
       </div>
       <div class="flex items-center gap-3">
         <a href="<?php echo base_url('dashboard/settings'); ?>" class="text-[10px] text-copper hover:text-gold border border-copper/50 hover:border-gold px-2 py-0.5 transition uppercase tracking-wider">
-          ⚙ EDIT COMPENDIUM
+          ⚙ Edit Settings
         </a>
         <span class="text-ash text-[11px] hidden sm:inline">HISTORICAL &amp; GEOGRAPHIC SURVEY</span>
       </div>
@@ -525,8 +525,8 @@
               </div>
 
               <div class="relative z-10 font-mono text-[10px] text-ash flex justify-between items-center bg-paper-ink/85 px-2.5 py-1 border border-paper-line/50">
-                <span class="text-gold flex items-center gap-1 font-bold"><span>⤢</span> CLICK TO EXPAND ATLAS</span>
-                <a href="<?php echo base_url('entries?type=realms'); ?>" class="text-copper hover:text-gold uppercase font-bold" onclick="event.stopPropagation()">GAZETTEER &rarr;</a>
+                <span class="text-gold flex items-center gap-1 font-bold"><span>⤢</span> Click to enlarge</span>
+                <a href="<?php echo base_url('entries?type=realms'); ?>" class="text-copper hover:text-gold uppercase font-bold" onclick="event.stopPropagation()">View Locations &rarr;</a>
               </div>
             </div>
           <?php else: ?>
@@ -559,7 +559,7 @@
 
               <div class="relative z-10 font-mono text-[10px] text-ash flex justify-between">
                 <span>FILE: <?php echo html_escape(isset($world_settings['map_plate_file']) && $world_settings['map_plate_file'] !== '' ? $world_settings['map_plate_file'] : 'MAP_' . strtoupper($world_name) . '.WEBP'); ?></span>
-                <a href="<?php echo base_url('dashboard/settings'); ?>" class="text-gold hover:underline">[UPLOAD MAP &rarr;]</a>
+                <a href="<?php echo base_url('dashboard/settings'); ?>" class="text-gold hover:underline">[Upload Map &rarr;]</a>
               </div>
             </div>
           <?php endif; ?>
@@ -634,9 +634,9 @@
             <a
               href="<?php echo base_url('?spotlight=random#lore-spotlight'); ?>"
               class="text-[10px] text-copper hover:text-gold border border-copper/50 hover:border-gold px-2 py-0.5 transition"
-              title="Draw a random record from the vault"
+              title="View a random entry"
             >
-              ↻ RANDOM RECORD
+              ↻ Random Entry
             </a>
           </div>
 

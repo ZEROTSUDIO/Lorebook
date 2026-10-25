@@ -7,13 +7,13 @@
       $current_tab = isset($active_tab) ? $active_tab : 'dashboard';
     ?>
     <a href="<?php echo base_url('dashboard'); ?>" class="px-3 py-1.5 border-2 <?php echo ($current_tab === 'dashboard') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> flex items-center gap-2 transition">
-      <span class="w-1.5 h-1.5 bg-gold rotate-45 inline-block"></span> ATLAS
+      <span class="w-1.5 h-1.5 bg-gold rotate-45 inline-block"></span> Home
     </a>
     <a href="<?php echo base_url('entries'); ?>" class="px-3 py-1.5 border-2 <?php echo ($current_tab === 'encyclopedia') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
-      ALL RECORDS
+      All Entries
     </a>
     <a href="<?php echo base_url('entries?type=characters'); ?>" class="px-3 py-1.5 border-2 <?php echo ($current_tab === 'characters' || $current_tab === 'persons') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
-      PERSONAE
+      Characters
     </a>
     <a href="<?php echo base_url('entries?type=nations'); ?>" class="px-3 py-1.5 border-2 <?php echo ($current_tab === 'nations' || $current_tab === 'realms') ? 'border-gold text-gold font-bold shadow-ink-sm bg-paper-panel' : 'border-paper-line hover:border-parchment-dark text-parchment-dim hover:text-parchment bg-paper-panel'; ?> transition">
       NATIONS
@@ -31,24 +31,24 @@
     <!-- Secondary Volumes Dropdown -->
     <div class="relative group">
       <button type="button" class="px-3 py-1.5 border-2 <?php echo in_array($current_tab, array('orders', 'species', 'bestiary', 'locations', 'magic')) ? 'border-gold text-gold font-bold bg-paper-panel' : 'border-paper-line hover:border-gold text-parchment-dim hover:text-gold bg-paper-panel'; ?> flex items-center gap-1.5 transition">
-        MORE VOLUMES <span class="text-[9px] text-gold">▼</span>
+        More <span class="text-[9px] text-gold">▼</span>
       </button>
       <div class="absolute left-0 top-full mt-1 w-60 bg-paper-ink border-2 border-paper-line shadow-ink-lg hidden group-hover:block z-50 py-1 text-left">
         <a href="<?php echo base_url('entries?type=orders'); ?>" class="block px-3 py-2 text-[11px] font-mono text-parchment-dim hover:text-gold hover:bg-paper-panel/80 border-b border-paper-line/50 transition">
-          <span class="text-copper font-bold block text-[9px]">VOL. VI // SYNOD</span>
+          <span class="text-copper font-bold block text-[9px]">Vol. VI</span>
           ORDERS &amp; GUILDS
         </a>
         <a href="<?php echo base_url('entries?type=species'); ?>" class="block px-3 py-2 text-[11px] font-mono text-parchment-dim hover:text-gold hover:bg-paper-panel/80 border-b border-paper-line/50 transition">
-          <span class="text-copper font-bold block text-[9px]">VOL. VII // BESTIARIUM</span>
-          PRIMAL BEASTS &amp; SPECIES
+          <span class="text-copper font-bold block text-[9px]">Vol. VII</span>
+          Beasts &amp; Species
         </a>
         <a href="<?php echo base_url('entries?type=locations'); ?>" class="block px-3 py-2 text-[11px] font-mono text-parchment-dim hover:text-gold hover:bg-paper-panel/80 border-b border-paper-line/50 transition">
-          <span class="text-copper font-bold block text-[9px]">VOL. VIII // TABULA</span>
-          LANDMARKS, SITES &amp; RUINS
+          <span class="text-copper font-bold block text-[9px]">Vol. VIII</span>
+          Landmarks &amp; Sites
         </a>
         <a href="<?php echo base_url('entries?type=magic'); ?>" class="block px-3 py-2 text-[11px] font-mono text-parchment-dim hover:text-gold hover:bg-paper-panel/80 transition">
-          <span class="text-copper font-bold block text-[9px]">VOL. IX // ARS OCCULTA</span>
-          CODEX OF ARCANE ARTS
+          <span class="text-copper font-bold block text-[9px]">Vol. IX</span>
+          Arcane Arts
         </a>
       </div>
     </div>
@@ -62,7 +62,7 @@
     </a>
 
     <a href="<?php echo base_url('entries/create'); ?>" class="px-3.5 py-1.5 border-2 <?php echo ($current_tab === 'create') ? 'border-gold text-paper-ink bg-gold font-bold shadow-ink-sm' : 'border-gold/70 text-gold-light hover:border-gold hover:text-white bg-paper-deep shadow-ink-sm'; ?> transition flex items-center gap-1.5">
-      <span class="font-bold">＋</span> INSCRIBE ENTRY
+      <span class="font-bold">＋</span> New Entry
     </a>
   </nav>
 
