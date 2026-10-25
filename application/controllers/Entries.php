@@ -427,11 +427,14 @@ class Entries extends CI_Controller {
     {
         $world_id = $this->session->userdata('active_world_id') ?: 1;
         $this->load->library('markdown_parser');
-        $raw_markdown = $this->input->post('markdown');
+        $raw_markdown = (string)$this->input->post('markdown');
         $html = $this->markdown_parser->parse($raw_markdown, $world_id);
         $this->output
              ->set_content_type('application/json')
-             ->set_output(json_encode(array('html' => $html)));
+             ->set_output(json_encode(array(
+                 'success' => true,
+                 'html'    => $html
+             )));
     }
 
     /**

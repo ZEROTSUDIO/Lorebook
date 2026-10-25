@@ -17,5 +17,10 @@
     </div>
   </footer>
 
+  <?php
+  // Global Illumination Lightbox & Archival Toast
+  $this->load->view('partials/lightbox');
+  ?>
+
 </body>
 </html>

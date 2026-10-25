@@ -229,6 +229,7 @@ lorekeeper/
 - [x] Live portrait preview and instant upload buttons in `entries/create.php` and `entries/edit.php`.
 - [x] Grimoire Markdown Image Parser (`![Caption](url/path)`) with illuminated figure styling, plate numbering (`PLATE I`, `PLATE II`), automatic local media resolution, and captions (`Markdown_parser.php`).
 - [ ] Dropzone / File picker for world cartography plates and architectural engravings in Compendium Settings.
+- [x] Editor Image Inscriber with Clipboard Paste (`Ctrl + V`), Drag-and-Drop file dropzone, toolbar `+Plate` uploader, live inscription status banner, and global Lightbox integration (`editor_inscriber_js.php`).
 - [ ] Entry Concept Art Folio & Gallery Drawer (multiple supporting sketches & attachments per entry).
 
 ### Milestone 5: Backup, Portability & Future Expansion

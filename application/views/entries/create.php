@@ -196,6 +196,7 @@
               <button type="button" onclick="insertSyntax('> ', '')" title="Blockquote" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold transition">&gt; Quote</button>
               <button type="button" onclick="insertSyntax('- ', '')" title="Bullet List" class="border border-paper-line hover:border-gold px-1.5 py-0.5 bg-paper-deep text-ash hover:text-gold transition">• List</button>
               <button type="button" onclick="insertWikiLink()" title="Insert Wiki Link to another entry" class="border border-gold/60 hover:border-gold px-2 py-0.5 bg-paper-deep text-gold font-bold transition">✦ [[Wiki Link]]</button>
+              <button type="button" onclick="triggerPlateUpload()" title="Inscribe Image Plate into Manuscript" class="border border-gold/60 hover:border-gold px-2 py-0.5 bg-paper-deep text-gold font-bold transition flex items-center gap-1"><span>🖼</span> +Plate</button>
             </div>
           </div>
 
@@ -216,6 +217,16 @@
                 <span>FULL ARTICLE BODY (MARKDOWN) *</span>
                 <span class="text-ash text-[10px]">CANONICAL PROSE // USE [[ENTRY NAME]] TO CROSS-REFERENCE</span>
               </label>
+
+              <!-- Live Plate Inscription Status Banner -->
+              <div id="editor-plate-status" class="hidden font-mono text-xs text-gold bg-paper-ink border border-gold/60 p-2 shadow-ink-sm flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 bg-gold animate-spin"></span>
+                  <span id="editor-plate-status-text" class="font-bold tracking-wider">INSCRIBING ILLUMINATION INTO MEDIA VAULT...</span>
+                </div>
+                <span class="text-[10px] text-ash">PASTE (CTRL+V) / DRAG &amp; DROP ACTIVE</span>
+              </div>
+
               <textarea name="content_markdown" id="content_markdown" rows="18" placeholder="Inscribe your detailed lore, backstory, relationships, and historical records here using Markdown...
 
 ## The Origin
@@ -415,3 +426,8 @@ function uploadCreateCover(input) {
   });
 }
 </script>
+
+<?php
+// Shared Markdown Editor Inscriber (Paste, Drag & Drop, Toolbar +Plate Button)
+$this->load->view('partials/editor_inscriber_js', $data ?? get_defined_vars());
+?>

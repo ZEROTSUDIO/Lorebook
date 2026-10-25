@@ -55,6 +55,7 @@ $route['dashboard'] = 'dashboard/index';
 $route['entries'] = 'entries/index';
 $route['entries/create'] = 'entries/create';
 $route['entries/store'] = 'entries/store';
+$route['entries/preview'] = 'entries/preview';
 $route['entries/view/(:num)'] = 'entries/view/$1';
 
 $route['media/upload'] = 'media/upload';
