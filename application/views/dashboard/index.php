@@ -3,6 +3,33 @@
   $world_desc = !empty($active_world->description)
     ? $active_world->description
     : 'The shattered northern continent of ancient clans, high keeps, and frozen covenants.';
+
+  if (!function_exists('resolve_lore_media_url')) {
+    function resolve_lore_media_url($path) {
+      if (empty($path)) return null;
+      $t = trim($path);
+      if (preg_match('#^https?://#i', $t)) return $t;
+      if (strpos($t, 'storage/media/') === 0 && file_exists(FCPATH . $t)) {
+        return base_url($t);
+      }
+      if (file_exists(FCPATH . 'storage/media/' . $t)) {
+        return base_url('storage/media/' . $t);
+      }
+      if (file_exists(FCPATH . $t)) {
+        return base_url($t);
+      }
+      return null;
+    }
+  }
+
+  $map_plate_file = isset($world_settings['map_plate_file']) ? $world_settings['map_plate_file'] : '';
+  $map_plate_url = resolve_lore_media_url($map_plate_file);
+
+  $arch_etching_file = isset($world_settings['arch_etching_file']) ? $world_settings['arch_etching_file'] : '';
+  $arch_etching_url = resolve_lore_media_url($arch_etching_file);
+
+  $hero_panorama_file = isset($world_settings['hero_panorama_file']) ? $world_settings['hero_panorama_file'] : '';
+  $hero_panorama_url = resolve_lore_media_url($hero_panorama_file);
 ?>
 
 <div class="flex flex-col gap-12">
@@ -29,8 +56,13 @@
       <!-- Inner Artwork Panorama Container -->
       <div class="relative min-h-[380px] sm:min-h-[430px] bg-paper-deep border-2 border-gold/50 corner-brackets overflow-hidden flex flex-col justify-between p-6 sm:p-10 shadow-ink">
         
+        <?php if (!empty($hero_panorama_url)): ?>
+          <!-- Custom Uploaded Hero Frontispiece Panorama Artwork -->
+          <img src="<?php echo html_escape($hero_panorama_url); ?>" alt="<?php echo html_escape($world_name); ?> Frontispiece Panorama" class="absolute inset-0 w-full h-full object-cover opacity-35 mix-blend-luminosity filter transition duration-700 pointer-events-none">
+        <?php endif; ?>
+
         <!-- Placeholder Atmospheric Artwork SVG (Celestial Astrolabe + Northern Crags & Watchtower Beacon) -->
-        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute inset-0 pointer-events-none overflow-hidden <?php echo !empty($hero_panorama_url) ? 'opacity-40' : ''; ?>">
           <!-- Subtle Radial Gold Glow -->
           <div class="absolute inset-0" style="background: radial-gradient(circle at 50% 32%, rgba(197, 168, 105, 0.16) 0%, rgba(186, 122, 85, 0.06) 38%, rgba(17, 16, 20, 0.94) 80%);"></div>
 
@@ -445,75 +477,136 @@
       <!-- RIGHT COLUMN (5 COLS): CARTOGRAPHY & ENGRAVING PLACEHOLDER PLATES -->
       <div class="lg:col-span-5 flex flex-col gap-5">
         
-        <!-- PLATE II: CARTOGRAPHIC MAP PLACEHOLDER -->
+        <!-- PLATE II: CARTOGRAPHIC MAP SURVEY PLATE -->
         <div class="bg-paper-base border-2 border-paper-line p-3 shadow-ink corner-brackets">
           <div class="flex items-center justify-between font-mono text-[10px] text-ash pb-2 border-b border-paper-line mb-2">
             <span class="text-gold font-bold">
               <?php echo html_escape(isset($world_settings['map_plate_label']) && $world_settings['map_plate_label'] !== '' ? $world_settings['map_plate_label'] : 'PLATE II // CARTOGRAPHIC SURVEY'); ?>
             </span>
-            <span>SCALE 1:2,400,000</span>
+            <span class="text-copper font-bold hidden sm:inline">● CANONICAL ATLAS</span>
           </div>
 
-          <div class="h-52 bg-paper-deep border border-dashed border-gold/40 relative overflow-hidden flex flex-col justify-between p-3">
-            <!-- Cartographic Map Placeholder SVG -->
-            <svg class="absolute inset-0 w-full h-full opacity-35 text-gold" viewBox="0 0 400 220" fill="none">
-              <!-- Rhumb Lines from Compass Rose -->
-              <line x1="330" y1="55" x2="0" y2="200" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
-              <line x1="330" y1="55" x2="0" y2="40" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
-              <line x1="330" y1="55" x2="180" y2="220" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
-              <!-- Compass Rose -->
-              <circle cx="330" cy="55" r="24" stroke="currentColor" stroke-width="1"/>
-              <polygon points="330,24 335,49 360,55 335,61 330,86 325,61 300,55 325,49" fill="currentColor" fill-opacity="0.25" stroke="currentColor" stroke-width="1"/>
-              <!-- Coastline & River Contour -->
-              <path d="M15,25 Q85,40 120,85 T210,145 T310,195" stroke="currentColor" stroke-width="1.5" fill="none"/>
-              <path d="M90,190 Q150,150 185,115 T255,60" stroke="#BA7A55" stroke-width="1.2" stroke-dasharray="4 3" fill="none"/>
-              <!-- Map Nodes -->
-              <circle cx="135" cy="65" r="4" fill="#C5A869"/>
-              <circle cx="185" cy="115" r="4" fill="#BA7A55"/>
-              <circle cx="235" cy="165" r="4" fill="#C5A869"/>
-            </svg>
+          <?php if (!empty($map_plate_url)): ?>
+            <!-- Real Uploaded Cartography Image Plate -->
+            <div class="relative min-h-[220px] max-h-[360px] bg-paper-deep border-2 border-gold/50 corner-brackets overflow-hidden flex flex-col justify-between p-3 group cursor-pointer transition hover:border-gold shadow-ink-sm" onclick="if(typeof openLightbox==='function') openLightbox('<?php echo html_escape($map_plate_url); ?>', '<?php echo html_escape($world_name); ?> — Cartographic Survey');">
+              <span class="absolute top-1 left-1 text-[10px] font-mono text-gold/60 pointer-events-none z-20">+</span>
+              <span class="absolute top-1 right-1 text-[10px] font-mono text-gold/60 pointer-events-none z-20">+</span>
+              <span class="absolute bottom-1 left-1 text-[10px] font-mono text-gold/60 pointer-events-none z-20">+</span>
+              <span class="absolute bottom-1 right-1 text-[10px] font-mono text-gold/60 pointer-events-none z-20">+</span>
 
-            <div class="relative z-10 flex justify-between text-[10px] font-mono text-gold/80">
-              <span>[MAP SURVEY]</span>
-              <span><?php echo strtoupper(html_escape($world_name)); ?></span>
-            </div>
+              <img src="<?php echo html_escape($map_plate_url); ?>" alt="Cartographic Survey Plate" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-[1.03]">
+              <div class="absolute inset-0 bg-gradient-to-t from-paper-ink/90 via-paper-ink/25 to-transparent pointer-events-none"></div>
 
-            <!-- Dynamic Map Labels -->
-            <div class="relative z-10 my-auto flex flex-col gap-1.5 pl-4 font-mono text-[10px]">
-              <span class="text-gold">◈ <?php echo html_escape(isset($world_settings['map_node_1']) && $world_settings['map_node_1'] !== '' ? $world_settings['map_node_1'] : 'PRIMARY CITADEL'); ?></span>
-              <span class="text-copper pl-6">◈ <?php echo html_escape(isset($world_settings['map_node_2']) && $world_settings['map_node_2'] !== '' ? $world_settings['map_node_2'] : 'BORDER PASS / GATEWAY'); ?></span>
-              <span class="text-parchment-dim pl-12">◈ <?php echo html_escape(isset($world_settings['map_node_3']) && $world_settings['map_node_3'] !== '' ? $world_settings['map_node_3'] : 'OUTER SETTLEMENTS'); ?></span>
-            </div>
+              <div class="relative z-10 flex justify-between text-[10px] font-mono text-gold font-bold">
+                <span class="bg-paper-ink/85 px-2 py-0.5 border border-gold/50 shadow-ink-sm">[MAP SURVEY]</span>
+                <span class="bg-paper-ink/85 px-2 py-0.5 border border-gold/50 shadow-ink-sm"><?php echo strtoupper(html_escape($world_name)); ?></span>
+              </div>
 
-            <div class="relative z-10 font-mono text-[10px] text-ash flex justify-between">
-              <span>FILE: <?php echo html_escape(isset($world_settings['map_plate_file']) && $world_settings['map_plate_file'] !== '' ? $world_settings['map_plate_file'] : 'MAP_' . strtoupper($world_name) . '.WEBP'); ?></span>
-              <a href="<?php echo base_url('entries?type=realms'); ?>" class="text-gold hover:underline">GAZETTEER &rarr;</a>
+              <!-- Overlaid Landmark Node Badges -->
+              <div class="relative z-10 my-auto flex flex-col gap-1.5 pl-2 font-mono text-[10px]">
+                <?php if (!empty($world_settings['map_node_1'])): ?>
+                  <span class="inline-flex items-center gap-1.5 bg-paper-ink/85 border border-gold text-gold px-2 py-0.5 shadow-ink-sm w-fit font-bold">
+                    <span class="w-1.5 h-1.5 bg-gold rotate-45"></span>
+                    <?php echo html_escape($world_settings['map_node_1']); ?>
+                  </span>
+                <?php endif; ?>
+                <?php if (!empty($world_settings['map_node_2'])): ?>
+                  <span class="inline-flex items-center gap-1.5 bg-paper-ink/85 border border-copper text-copper px-2 py-0.5 shadow-ink-sm w-fit font-bold pl-4">
+                    <span class="w-1.5 h-1.5 bg-copper rotate-45"></span>
+                    <?php echo html_escape($world_settings['map_node_2']); ?>
+                  </span>
+                <?php endif; ?>
+                <?php if (!empty($world_settings['map_node_3'])): ?>
+                  <span class="inline-flex items-center gap-1.5 bg-paper-ink/85 border border-paper-line text-parchment-dim px-2 py-0.5 shadow-ink-sm w-fit pl-8">
+                    <span class="w-1.5 h-1.5 bg-parchment-dim rotate-45"></span>
+                    <?php echo html_escape($world_settings['map_node_3']); ?>
+                  </span>
+                <?php endif; ?>
+              </div>
+
+              <div class="relative z-10 font-mono text-[10px] text-ash flex justify-between items-center bg-paper-ink/85 px-2.5 py-1 border border-paper-line/50">
+                <span class="text-gold flex items-center gap-1 font-bold"><span>⤢</span> CLICK TO EXPAND ATLAS</span>
+                <a href="<?php echo base_url('entries?type=realms'); ?>" class="text-copper hover:text-gold uppercase font-bold" onclick="event.stopPropagation()">GAZETTEER &rarr;</a>
+              </div>
             </div>
-          </div>
+          <?php else: ?>
+            <!-- Fallback Cartographic Map Placeholder SVG -->
+            <div class="h-52 bg-paper-deep border border-dashed border-gold/40 relative overflow-hidden flex flex-col justify-between p-3">
+              <svg class="absolute inset-0 w-full h-full opacity-35 text-gold" viewBox="0 0 400 220" fill="none">
+                <line x1="330" y1="55" x2="0" y2="200" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
+                <line x1="330" y1="55" x2="0" y2="40" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
+                <line x1="330" y1="55" x2="180" y2="220" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
+                <circle cx="330" cy="55" r="24" stroke="currentColor" stroke-width="1"/>
+                <polygon points="330,24 335,49 360,55 335,61 330,86 325,61 300,55 325,49" fill="currentColor" fill-opacity="0.25" stroke="currentColor" stroke-width="1"/>
+                <path d="M15,25 Q85,40 120,85 T210,145 T310,195" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                <path d="M90,190 Q150,150 185,115 T255,60" stroke="#BA7A55" stroke-width="1.2" stroke-dasharray="4 3" fill="none"/>
+                <circle cx="135" cy="65" r="4" fill="#C5A869"/>
+                <circle cx="185" cy="115" r="4" fill="#BA7A55"/>
+                <circle cx="235" cy="165" r="4" fill="#C5A869"/>
+              </svg>
+
+              <div class="relative z-10 flex justify-between text-[10px] font-mono text-gold/80">
+                <span>[MAP SURVEY]</span>
+                <span><?php echo strtoupper(html_escape($world_name)); ?></span>
+              </div>
+
+              <!-- Dynamic Map Labels -->
+              <div class="relative z-10 my-auto flex flex-col gap-1.5 pl-4 font-mono text-[10px]">
+                <span class="text-gold">◈ <?php echo html_escape(isset($world_settings['map_node_1']) && $world_settings['map_node_1'] !== '' ? $world_settings['map_node_1'] : 'PRIMARY CITADEL'); ?></span>
+                <span class="text-copper pl-6">◈ <?php echo html_escape(isset($world_settings['map_node_2']) && $world_settings['map_node_2'] !== '' ? $world_settings['map_node_2'] : 'BORDER PASS / GATEWAY'); ?></span>
+                <span class="text-parchment-dim pl-12">◈ <?php echo html_escape(isset($world_settings['map_node_3']) && $world_settings['map_node_3'] !== '' ? $world_settings['map_node_3'] : 'OUTER SETTLEMENTS'); ?></span>
+              </div>
+
+              <div class="relative z-10 font-mono text-[10px] text-ash flex justify-between">
+                <span>FILE: <?php echo html_escape(isset($world_settings['map_plate_file']) && $world_settings['map_plate_file'] !== '' ? $world_settings['map_plate_file'] : 'MAP_' . strtoupper($world_name) . '.WEBP'); ?></span>
+                <a href="<?php echo base_url('dashboard/settings'); ?>" class="text-gold hover:underline">[UPLOAD MAP &rarr;]</a>
+              </div>
+            </div>
+          <?php endif; ?>
         </div>
 
-        <!-- PLATE III: HISTORICAL WOODCUT / ARCHITECTURE PLACEHOLDER -->
+        <!-- PLATE III: HISTORICAL ARCHITECTURAL ETCHING / WOODCUT -->
         <div class="bg-paper-base border-2 border-paper-line p-3 shadow-ink corner-brackets">
           <div class="flex items-center justify-between font-mono text-[10px] text-ash pb-2 border-b border-paper-line mb-2">
             <span class="text-copper font-bold">
               <?php echo html_escape(isset($world_settings['arch_etching_title']) && $world_settings['arch_etching_title'] !== '' ? $world_settings['arch_etching_title'] : 'PLATE III // ARCHITECTURAL ETCHING'); ?>
             </span>
-            <span>FIG. 04</span>
+            <span class="text-gold font-bold">● ETCHING</span>
           </div>
 
-          <div class="h-40 bg-paper-deep border border-dashed border-paper-line relative overflow-hidden flex flex-col items-center justify-center p-4 text-center">
-            <!-- Architectural Arch SVG -->
-            <svg class="w-20 h-20 opacity-20 text-copper mb-1" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M15,90 L15,45 A35,35 0 0,1 85,45 L85,90"/>
-              <path d="M28,90 L28,48 A22,22 0 0,1 72,48 L72,90"/>
-              <line x1="5" y1="90" x2="95" y2="90"/>
-              <circle cx="50" cy="28" r="5"/>
-            </svg>
-            <span class="font-display italic text-base text-parchment-dim">[Woodcut Engraving]</span>
-            <span class="font-mono text-[10px] text-ash uppercase tracking-widest mt-0.5">
-              <?php echo html_escape(isset($world_settings['arch_etching_caption']) && $world_settings['arch_etching_caption'] !== '' ? $world_settings['arch_etching_caption'] : 'ENGRAVING OF ' . strtoupper($world_name)); ?>
-            </span>
-          </div>
+          <?php if (!empty($arch_etching_url)): ?>
+            <!-- Real Uploaded Architectural Etching Plate -->
+            <div class="relative min-h-[160px] max-h-[240px] bg-paper-deep border-2 border-copper/50 corner-brackets overflow-hidden flex flex-col justify-end p-3 group cursor-pointer transition hover:border-copper shadow-ink-sm" onclick="if(typeof openLightbox==='function') openLightbox('<?php echo html_escape($arch_etching_url); ?>', '<?php echo html_escape(!empty($world_settings['arch_etching_caption']) ? $world_settings['arch_etching_caption'] : 'Architectural Etching'); ?>');">
+              <span class="absolute top-1 left-1 text-[10px] font-mono text-copper/60 pointer-events-none z-20">+</span>
+              <span class="absolute top-1 right-1 text-[10px] font-mono text-copper/60 pointer-events-none z-20">+</span>
+              <span class="absolute bottom-1 left-1 text-[10px] font-mono text-copper/60 pointer-events-none z-20">+</span>
+              <span class="absolute bottom-1 right-1 text-[10px] font-mono text-copper/60 pointer-events-none z-20">+</span>
+
+              <img src="<?php echo html_escape($arch_etching_url); ?>" alt="Architectural Etching Plate" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-[1.03]">
+              <div class="absolute inset-0 bg-gradient-to-t from-paper-ink/90 via-paper-ink/20 to-transparent pointer-events-none"></div>
+
+              <div class="relative z-10 font-mono text-[10px] text-parchment flex justify-between items-center bg-paper-ink/80 px-2 py-1 border border-paper-line/50">
+                <span class="text-parchment font-newsreader italic text-xs truncate max-w-[240px]">
+                  <?php echo html_escape(!empty($world_settings['arch_etching_caption']) ? $world_settings['arch_etching_caption'] : 'Engraving of ' . $world_name); ?>
+                </span>
+                <span class="text-copper font-bold text-[9px] flex items-center gap-1"><span>⤢</span> ENLARGE</span>
+              </div>
+            </div>
+          <?php else: ?>
+            <!-- Fallback Architectural Arch SVG Placeholder -->
+            <div class="h-40 bg-paper-deep border border-dashed border-paper-line relative overflow-hidden flex flex-col items-center justify-center p-4 text-center">
+              <svg class="w-20 h-20 opacity-20 text-copper mb-1" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M15,90 L15,45 A35,35 0 0,1 85,45 L85,90"/>
+                <path d="M28,90 L28,48 A22,22 0 0,1 72,48 L72,90"/>
+                <line x1="5" y1="90" x2="95" y2="90"/>
+                <circle cx="50" cy="28" r="5"/>
+              </svg>
+              <span class="font-display italic text-base text-parchment-dim">[Woodcut Engraving]</span>
+              <span class="font-mono text-[10px] text-ash uppercase tracking-widest mt-0.5">
+                <?php echo html_escape(isset($world_settings['arch_etching_caption']) && $world_settings['arch_etching_caption'] !== '' ? $world_settings['arch_etching_caption'] : 'ENGRAVING OF ' . strtoupper($world_name)); ?>
+              </span>
+            </div>
+          <?php endif; ?>
         </div>
 
       </div>
