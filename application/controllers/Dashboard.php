@@ -235,6 +235,7 @@ class Dashboard extends CI_Controller {
                 'calendar_system',
                 'current_cycle',
                 'realm_status',
+                'hero_panorama_file',
                 'map_plate_label',
                 'map_plate_file',
                 'map_node_1',
@@ -242,6 +243,7 @@ class Dashboard extends CI_Controller {
                 'map_node_3',
                 'arch_etching_title',
                 'arch_etching_caption',
+                'arch_etching_file',
             );
 
             foreach ($keys as $k) {
